@@ -15,6 +15,9 @@ import { celebrate, Joi } from 'celebrate';
 import path, { join, parse } from 'path';
 import ScriptService from '../services/script';
 import multer from 'multer';
+
+import dayjs from 'dayjs';
+
 const route = Router();
 
 const storage = multer.diskStorage({
@@ -190,6 +193,14 @@ export default (app: Router) => {
         };
         const filePath = join(config.scriptPath, path, filename);
         await fs.writeFile(filePath, content);
+
+        // 备份脚本
+        const { name, ext } = parse(filename);
+        const logPath = join(config.logPath, path, `${name}.swap`);
+        const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
+        const bakPath = `${logPath}/${filename}-${execTime}.bak`;
+        await fs.writeFile(bakPath, content);
+        
         return res.send({ code: 200 });
       } catch (e) {
         return next(e);
@@ -269,6 +280,12 @@ export default (app: Router) => {
         const { name, ext } = parse(filename);
         const filePath = join(config.scriptPath, path, `${name}.swap${ext}`);
         await fs.writeFile(filePath, content || '', { encoding: 'utf8' });
+
+        // 备份执行脚本
+        const logPath = join(config.logPath, path, `${name}.swap`);
+        const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
+        const bakPath = `${logPath}/${execTime}.bak`;
+        await fs.writeFile(bakPath, content);
 
         const scriptService = Container.get(ScriptService);
         const result = await scriptService.runScript(filePath);
