@@ -27,6 +27,8 @@ import {
   DownloadOutlined,
   EditOutlined,
   EllipsisOutlined,
+  FileFilled,
+  FolderOutlined,
   FormOutlined,
   PlusOutlined,
   PlusSquareOutlined,
@@ -46,6 +48,7 @@ import RenameModal from './renameModal';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { useHotkeys } from 'react-hotkeys-hook';
 import prettyBytes from 'pretty-bytes';
+import Icon from '@ant-design/icons/lib/components/Icon';
 const { Text } = Typography;
 
 const Script = () => {
@@ -364,6 +367,7 @@ const Script = () => {
         newData.unshift(_file);
       }
       setData(newData);
+      console.log("add path", path)
       onSelect(_file.title, _file);
       setIsEditing(true);
     }
@@ -632,11 +636,14 @@ const Script = () => {
                       className={styles['left-tree']}
                       treeData={filterData}
                       showIcon={true}
+                      icon={(nodeData:any) => {
+                        return nodeData.type == 'file' ? <FileFilled/>:<FolderOutlined/>
+                      }}
                       height={height}
                       selectedKeys={[select]}
                       expandedKeys={expandedKeys}
                       onExpand={onExpand}
-                      showLine={{ showLeafIcon: true }}
+                      showLine={{ showLeafIcon: false }}
                       onSelect={onTreeSelect}
                       onDoubleClick={onDoubleClick}
                     ></Tree>
@@ -702,6 +709,7 @@ const Script = () => {
           visible={isAddFileModalVisible}
           treeData={data}
           handleCancel={addFileModalClose}
+          onSuccess={getScripts}
         />
         <RenameModal
           visible={isRenameFileModalVisible}

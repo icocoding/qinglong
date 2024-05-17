@@ -20,6 +20,7 @@ const EditScriptNameModal = ({
   handleCancel,
   treeData,
   visible,
+  onSuccess,
 }: {
   visible: boolean;
   treeData: any[];
@@ -28,6 +29,7 @@ const EditScriptNameModal = ({
     path: string;
     key: string;
   }) => void;
+  onSuccess: () => void;
 }) => {
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -58,6 +60,7 @@ const EditScriptNameModal = ({
             path,
             key: `${key}${filename}`,
           });
+          onSuccess();
         }
         setLoading(false);
       })
