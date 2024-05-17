@@ -16,7 +16,7 @@ export default class ConfigService {
     }
     if (filePath.startsWith('sample/')) {
       const res = await got.get(
-        `https://gitlab.com/whyour/qinglong/-/raw/master/${filePath}`,
+        `https://gitlab.com/icocoding/qinglong/-/raw/master/${filePath}`,
       );
       content = res.body;
     } else if (filePath.startsWith('data/scripts/')) {

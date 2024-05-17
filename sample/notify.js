@@ -615,7 +615,7 @@ function do_qywxamNotify(text, desp) {
               textcard: {
                 title: `${text}`,
                 description: `${desp}`,
-                url: 'https://github.com/whyour/qinglong',
+                url: 'https://github.com/icocoding/qinglong',
                 btntxt: '更多',
               },
             };

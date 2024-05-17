@@ -14,7 +14,8 @@ if (!process.env.QL_DIR) {
   process.env.QL_DIR = qlHomePath.replace(/\/$/g, '');
 }
 
-const lastVersionFile = `https://qn.whyour.cn/version.yaml`;
+// const lastVersionFile = `https://qn.whyour.cn/version.yaml`;
+const lastVersionFile = `https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml`;
 
 const rootPath = process.env.QL_DIR as string;
 const envFound = dotenv.config({ path: path.join(rootPath, '.env') });

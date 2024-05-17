@@ -1,6 +1,7 @@
 version: 2024.05.0
-changeLogLink: https://github.com/icocoding/qinglong
-publishTime: 2024-05-17 07:49:01
+changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
+publishTime: 2024-05-17 21:40
 changeLog: |
-  1. 增加脚本保存备份
-  2. 编辑脚本时，Command+S直接保存，去掉提示框
+  1. 增加：脚本保存备份，防止异常时丢失脚本😭
+  2. 优化：编辑脚本时，Command+S直接保存，去掉提示框
+  3. 优化：文件、文件夹后更新目录树

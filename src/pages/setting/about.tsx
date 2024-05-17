@@ -34,7 +34,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
           </Descriptions.Item>
           <Descriptions.Item label={intl.get('更新日志')} span={3}>
             <Link
-              href={`https://qn.whyour.cn/version.yaml?t=${Date.now()}`}
+              href={`https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml?t=${Date.now()}`}
               target="_blank"
             >
               {intl.get('查看')}
@@ -43,7 +43,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
         </Descriptions>
         <div>
           <Link
-            href="https://github.com/whyour/qinglong"
+            href="https://github.com/icocoding/qinglong"
             target="_blank"
             style={{ marginRight: 15 }}
           >
@@ -57,7 +57,7 @@ const About = ({ systemInfo }: { systemInfo: SharedContext['systemInfo'] }) => {
             {intl.get('Telegram频道')}
           </Link>
           <Link
-            href="https://github.com/whyour/qinglong/issues"
+            href="https://github.com/icocoding/qinglong/issues"
             target="_blank"
           >
             {intl.get('提交BUG')}

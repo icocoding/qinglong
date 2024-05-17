@@ -259,13 +259,13 @@ reload_qinglong() {
 update_qinglong() {
   rm -rf ${dir_tmp}/*
   local mirror="gitee"
-  local downloadQLUrl="https://gitee.com/whyour/qinglong/repository/archive"
-  local downloadStaticUrl="https://gitee.com/whyour/qinglong-static/repository/archive"
+  local downloadQLUrl="https://gitee.com/${QL_MAINTAINER}/qinglong/repository/archive"
+  local downloadStaticUrl="https://gitee.com/${QL_MAINTAINER}/qinglong-static/repository/archive"
   local githubStatus=$(curl -s --noproxy "*" -m 2 -IL "https://google.com" | grep 200)
   if [[ ! -z $githubStatus ]]; then
     mirror="github"
-    downloadQLUrl="https://github.com/whyour/qinglong/archive/refs/heads"
-    downloadStaticUrl="https://github.com/whyour/qinglong-static/archive/refs/heads"
+    downloadQLUrl="https://github.com/${QL_MAINTAINER}/qinglong/archive/refs/heads"
+    downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong-static/archive/refs/heads"
   fi
   echo -e "使用 ${mirror} 源更新...\n"
 

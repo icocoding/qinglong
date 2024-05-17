@@ -34,7 +34,7 @@ export default async ({ server }: { server: Server }) => {
 
         return;
       } else {
-        conn.write(JSON.stringify({ type: 'ping', message: 'whyour' }));
+        conn.write(JSON.stringify({ type: 'ping', message: 'icocoding' }));
       }
     }
 
