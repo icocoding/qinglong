@@ -174,6 +174,9 @@ export default (app: Router) => {
     },
   );
 
+  /**
+   * 编辑保存
+   */
   route.put(
     '/',
     celebrate({
@@ -196,7 +199,8 @@ export default (app: Router) => {
 
         // 备份脚本
         const { name, ext } = parse(filename);
-        const bakDir = join(config.logPath,`${path.replace('/', '-')}-${name}.bak`);
+        const prefix = path == '/' ? '' : path.replace('/', '-');
+        const bakDir = join(config.logPath,`${prefix}${name}.bak`);
         const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
         const bakPath = `${bakDir}/${execTime}${ext}`;
         const fileExists = await fileExist(bakDir);
@@ -268,6 +272,9 @@ export default (app: Router) => {
     },
   );
 
+  /**
+   * 调式执行
+   */
   route.put(
     '/run',
     celebrate({
@@ -286,7 +293,9 @@ export default (app: Router) => {
         await fs.writeFile(filePath, content || '', { encoding: 'utf8' });
 
         // 备份执行脚本
-        const bakDir = join(config.logPath, path, `${name}.swap`);
+        const prefix = path == '/' ? '' : path.replace('/', '-');
+        const bakDir = join(config.logPath,`${prefix}${name}.bak`);
+        // const bakDir = join(config.logPath, path, `${name}.swap`);
         const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
         const bakPath = `${bakDir}/${execTime}${ext}`;
         const fileExists = await fileExist(bakDir);

@@ -1,19 +1,34 @@
 FROM python:3.11-alpine3.18 as builder
-COPY package.json .npmrc pnpm-lock.yaml /tmp/build/
+ARG QL_MAINTAINER="icocoding"
+LABEL maintainer="${QL_MAINTAINER}"
+ENV QL_MAINTAINER=${QL_MAINTAINER}
+ARG QL_URL=https://github.com/${QL_MAINTAINER}/qinglong.git
+ARG QL_BRANCH=develop
+ENV QL_DIR=/ql
+ARG BUILD_DIR=${QL_DIR}/.build
+RUN set -x \
+  && apk update -f \
+  && apk upgrade \
+  && apk --no-cache add -f bash \
+  git \
+  && git clone --depth=1 -b ${QL_BRANCH} ${QL_URL} ${BUILD_DIR} \
+  && cd ${BUILD_DIR} \
+  && cp -f .env.example .env
+
 RUN set -x \
   && apk update \
   && apk add nodejs npm git \
   && npm i -g pnpm@8.3.1 pm2 tsx \
-  && cd /tmp/build \
+  && cd ${BUILD_DIR} \
   && pnpm install --prod
 
-FROM python:3.11-alpine
 
+# 2
+
+FROM python:3.11-alpine
 ARG QL_MAINTAINER="icocoding"
 LABEL maintainer="${QL_MAINTAINER}"
-ARG QL_URL=https://github.com/${QL_MAINTAINER}/qinglong.git
 ARG QL_BRANCH=develop
-
 ENV PNPM_HOME=/root/.local/share/pnpm \
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.local/share/pnpm:/root/.local/share/pnpm/global/5/node_modules:$PNPM_HOME \
   NODE_PATH=/usr/local/bin:/usr/local/pnpm-global/5/node_modules:/usr/local/lib/node_modules:/root/.local/share/pnpm/global/5/node_modules \
@@ -21,10 +36,13 @@ ENV PNPM_HOME=/root/.local/share/pnpm \
   SHELL=/bin/bash \
   PS1="\u@\h:\w \$ " \
   QL_DIR=/ql \
-  QL_BRANCH=${QL_BRANCH}
+  QL_BRANCH=${QL_BRANCH} \
+  QL_MAINTAINER=${QL_MAINTAINER}
 
 VOLUME /ql/data
-  
+
+ARG BUILD_DIR=${QL_DIR}/.build
+
 EXPOSE 5700
 
 COPY --from=builder /usr/local/lib/node_modules/. /usr/local/lib/node_modules/
@@ -62,17 +80,11 @@ RUN set -x \
   && ulimit -c 0
 
 ARG SOURCE_COMMIT
-RUN git clone --depth=1 -b ${QL_BRANCH} ${QL_URL} ${QL_DIR} \
-  && cd ${QL_DIR} \
-  && cp -f .env.example .env \
+COPY --from=builder ${BUILD_DIR}/. ${QL_DIR}/
+RUN cd ${QL_DIR} \
   && chmod 777 ${QL_DIR}/shell/*.sh \
   && chmod 777 ${QL_DIR}/docker/*.sh \
-  && git clone --depth=1 -b ${QL_BRANCH} https://github.com/${QL_MAINTAINER}/qinglong-static.git /static \
-  && mkdir -p ${QL_DIR}/static \
-  && cp -rf /static/* ${QL_DIR}/static \
-  && rm -rf /static
-
-COPY --from=builder /tmp/build/node_modules/. /ql/node_modules/
+  && git clone --depth=1 -b ${QL_BRANCH} https://github.com/${QL_MAINTAINER}/qinglong-static.git ${QL_DIR}/static
 
 WORKDIR ${QL_DIR}
 
