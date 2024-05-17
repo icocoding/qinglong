@@ -86,9 +86,8 @@ RUN cd ${QL_DIR} \
   && chmod 777 ${QL_DIR}/docker/*.sh \
   && git clone --depth=1 -b ${QL_BRANCH} https://github.com/${QL_MAINTAINER}/qinglong-static.git ${QL_DIR}/static
 
-RUN cat ${QL_DIR}/.env
-RUN cat ${QL_DIR}/version.yaml
-
+RUN bash -c 'cat ${QL_DIR}/.env'
+RUN bash -c 'cat ${QL_DIR}/version.yaml'
 WORKDIR ${QL_DIR}
 
 HEALTHCHECK --interval=5s --timeout=2s --retries=20 \
