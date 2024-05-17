@@ -196,9 +196,13 @@ export default (app: Router) => {
 
         // 备份脚本
         const { name, ext } = parse(filename);
-        const logPath = join(config.logPath, path, `${name}.swap`);
+        const bakDir = join(config.logPath,`${path.replace('/', '-')}-${name}.bak`);
         const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
-        const bakPath = `${logPath}/${filename}-${execTime}.bak`;
+        const bakPath = `${bakDir}/${execTime}${ext}`;
+        const fileExists = await fileExist(bakDir);
+        if (!fileExists) {
+          await fs.mkdir(bakDir);
+        }
         await fs.writeFile(bakPath, content);
         
         return res.send({ code: 200 });
@@ -282,9 +286,13 @@ export default (app: Router) => {
         await fs.writeFile(filePath, content || '', { encoding: 'utf8' });
 
         // 备份执行脚本
-        const logPath = join(config.logPath, path, `${name}.swap`);
+        const bakDir = join(config.logPath, path, `${name}.swap`);
         const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
-        const bakPath = `${logPath}/${execTime}.bak`;
+        const bakPath = `${bakDir}/${execTime}${ext}`;
+        const fileExists = await fileExist(bakDir);
+        if (!fileExists) {
+          await fs.mkdir(bakDir);
+        }
         await fs.writeFile(bakPath, content);
 
         const scriptService = Container.get(ScriptService);

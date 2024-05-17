@@ -17,6 +17,7 @@ import { useTheme } from '@/utils/hooks';
 import { getEditorMode, logEnded } from '@/utils';
 import WebSocketManager from '@/utils/websocket';
 import Ansi from 'ansi-to-react';
+import { useHotkeys } from 'react-hotkeys-hook';
 
 const { Option } = Select;
 

@@ -1,11 +1,6 @@
-version: 2.17.4
-changeLogLink: https://t.me/jiao_long/405
-publishTime: 2024-04-26 22:00
+version: 2024.05.0
+changeLogLink: https://github.com/icocoding/qinglong
+publishTime: 2024-05-17 07:49:01
 changeLog: |
-  1. 增加示例脚本
-  2. 修复上传脚本文件名乱码
-  3. 修复飞书通知结果校验
-  4. 修复删除日志提示
-  5. 修复自定义通知 text/plain 类型
-  6. 修复脚本和日志列表软连接循环报错
-  7. 修复 python 通知文件自定义 send
+  1. 增加脚本保存备份
+  2. 编辑脚本时，Command+S直接保存，去掉提示框

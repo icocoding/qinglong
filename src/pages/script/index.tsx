@@ -163,7 +163,7 @@ const Script = () => {
   );
 
   const onSearch = useCallback(
-    (e) => {
+    (e: { target: { value: any; }; }) => {
       const keyword = e.target.value;
       debounceSearch(keyword);
     },
@@ -212,6 +212,30 @@ const Script = () => {
   };
 
   const saveFile = () => {
+
+    const content = editorRef.current
+    ? editorRef.current.getValue().replace(/\r\n/g, '\n')
+    : value;
+
+    return new Promise((resolve, reject) => {
+      request
+        .put(`${config.apiPrefix}scripts`, {
+          filename: currentNode.title,
+          path: currentNode.parent || '',
+          content,
+        })
+        .then(({ code, data }) => {
+          if (code === 200) {
+            message.success(`保存成功`);
+            setValue(content);
+            setIsEditing(false);
+          }
+          resolve(null);
+        })
+        .catch((e) => reject(e));
+    });
+    
+    // 直接保存
     Modal.confirm({
       title: `确认保存`,
       content: (
