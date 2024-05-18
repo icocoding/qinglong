@@ -62,8 +62,7 @@ jobs:
           release_name: Release ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
           draft: true
           prerelease: true
-          body: |
-            echo "${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}"
+          body: ${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}
 
       - uses: actions/upload-release-asset@v1.0.1
         env:
