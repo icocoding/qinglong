@@ -34,18 +34,22 @@ jobs:
           cache: "pnpm"
 
       - name: build front and back
+        id: build_front_and_back
         run: |
           pnpm install --frozen-lockfile
           pnpm build:front
           pnpm build:back
+          ls static
+          echo "::set-output name=STATIC_PATH::$(pwd)/static"
 
       - uses: actions/checkout@v2
         id: zip_static
       - name: Zip the file
         run: |
-          zip -r qinglong_static.zip static
-          echo "::set-output PUBLISH_NOTE=$(cat version.yaml)::"
-          echo "::set-output TAG_NAME=$(date +'%Y%m%d%H%M%S')::"
+          zip -r qinglong_static.zip ${{ steps.build_front_and_back.outputs.STATIC_PATH }}
+          echo "::set-output name=PUBLISH_NOTE::$(cat version.yaml)"
+          echo "::set-output name=TAG_NAME::$(date +'%Y%m%d%H%M%S')"
+          echo "::set-output name=ZIP_FILE_PATH::$(pwd)/qinglong_static.zip"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -64,7 +68,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./qinglong_static.zip
+          asset_path: ${{ steps.zip_static.outputs.ZIP_FILE_PATH }}
           asset_name: qinglong_static.zip
           asset_content_type: application/zip
 
