@@ -84,7 +84,10 @@ COPY --from=builder ${BUILD_DIR}/. ${QL_DIR}/
 RUN cd ${QL_DIR} \
   && chmod 777 ${QL_DIR}/shell/*.sh \
   && chmod 777 ${QL_DIR}/docker/*.sh \
-  && git clone --depth=1 -b ${QL_BRANCH} https://github.com/${QL_MAINTAINER}/qinglong-static.git ${QL_DIR}/static
+  && last_version=$(curl -Ls "https://api.github.com/repos/${QL_MAINTAINER}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
+  && wget -N --no-check-certificate -O qinglong_static.zip https://github.com/${QL_MAINTAINER}/qinglong/releases/download/${last_version}/qinglong-static.zip \
+  && unzip -o qinglong_static.zip -d /static \
+  && rm -f qinglong_static.zip
 
 RUN bash -c 'cat ${QL_DIR}/.env'
 RUN bash -c 'cat ${QL_DIR}/version.yaml'
