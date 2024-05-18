@@ -42,7 +42,7 @@ jobs:
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
           echo "::set-output name=PUBLISH_NOTE::$(cat version.yaml)"
-          tag_name=cat version.yaml | grep 'version:' | awk '{print $2}'
+          tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}')
           echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
 
       - name: Zip the file
