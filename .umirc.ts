@@ -33,6 +33,9 @@ export default defineConfig({
       pathRewrite: { [`^${baseUrl}api`]: '/api' },
     },
   },
+  codeSplitting: {
+    jsStrategy: 'depPerChunk',
+  },
   chainWebpack: ((config: any) => {
     config.plugin('compression-webpack-plugin').use(
       new CompressionPlugin({
@@ -42,6 +45,37 @@ export default defineConfig({
         minRatio: 0.6,
       }),
     );
+    if (process.env.NODE_ENV === 'production') {
+      
+      // config.optimization.splitChunks.chunks = function(chunk: { name: string; }) {
+      //       // Exclude specific chunks
+      //       return chunk.name.endsWith('.js'); 
+      //     // },
+      //   }
+        // minimize: true,
+        // minimizer: [
+        //   new TerserPlugin({
+        //     terserOptions: {
+        //       compress: {
+        //         drop_console: true,
+        //         drop_debugger: true,
+        //       },
+        //     },
+        //   }),
+        // ],
+      // };
+      config.performance
+      .maxEntrypointSize(5_000_000) // 设置入口文件大小限制
+      .maxAssetSize(5_000_000); // 设置资源文件大小限制
+      // config.performance = {
+      //   hints: 'warning', // 或者"error"，如果你想要在限制内发出错误
+      //   maxAssetSize: 200_000, // 最大资源大小（字节）
+      //   maxEntrypointSize: 400_000, // 最大入口大小（字节）
+      //   assetFilter: function (assetFilename: string) {
+      //     return assetFilename.endsWith('.js');
+      //   },
+      // }
+    }
   }) as any,
   externals: {
     react: 'window.React',
