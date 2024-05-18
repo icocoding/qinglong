@@ -41,13 +41,16 @@ jobs:
           pnpm build:back
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
+          echo "::set-output name=PUBLISH_NOTE::$(cat version.yaml)"
+          tag_name=cat version.yaml | grep 'version:' | awk '{print $2}'
+          echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
 
       - name: Zip the file
         id: zip_static
         run: |
-          zip -r qinglong_static.zip ${{ steps.build_front_and_back.outputs.STATIC_PATH }}
-          echo "::set-output name=PUBLISH_NOTE::$(cat version.yaml)"
-          echo "::set-output name=TAG_NAME::$(date +'%Y%m%d%H%M%S')"
+          STATIC_PATH=${{ steps.build_front_and_back.outputs.STATIC_PATH }}
+          zip -r qinglong_static.zip ${STATIC_PATH}
+          
           echo "::set-output name=ZIP_FILE_PATH::$(pwd)/qinglong_static.zip"
       - name: Create Release
         id: create_release
@@ -55,12 +58,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.zip_static.outputs.TAG_NAME }}
-          release_name: Release ${{ steps.zip_static.outputs.TAG_NAME }}
+          tag_name: ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
+          release_name: Release ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
           draft: true
           prerelease: false
           body: |
-            ${{ steps.zip_static.outputs.PUBLISH_NOTE }}
+            "${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}"
 
       - uses: actions/upload-release-asset@v1.0.1
         env:
