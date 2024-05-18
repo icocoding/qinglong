@@ -63,7 +63,7 @@ jobs:
           draft: true
           prerelease: false
           body: |
-            "${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}"
+            echo "${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}"
 
       - uses: actions/upload-release-asset@v1.0.1
         env:
