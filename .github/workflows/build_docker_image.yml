@@ -61,7 +61,7 @@ jobs:
           tag_name: ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
           release_name: Release ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
           draft: true
-          prerelease: false
+          prerelease: true
           body: |
             echo "${{ steps.build_front_and_back.outputs.PUBLISH_NOTE }}"
 
