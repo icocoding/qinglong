@@ -42,9 +42,8 @@ jobs:
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
 
-      - uses: actions/checkout@v2
-        id: zip_static
       - name: Zip the file
+        id: zip_static
         run: |
           zip -r qinglong_static.zip ${{ steps.build_front_and_back.outputs.STATIC_PATH }}
           echo "::set-output name=PUBLISH_NOTE::$(cat version.yaml)"
