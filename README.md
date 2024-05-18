@@ -6,7 +6,7 @@
 ## 安装
 
  ```shell
- bash <(curl -Ls https://raw.githubusercontent.com/icocoding/qinglong/develop/install.sh)
+ bash <(curl -Ls https://github.com/icocoding/qinglong/releases/download/tools/install.sh)
  ```
 
  ## 更新日志
