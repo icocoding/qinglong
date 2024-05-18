@@ -22,7 +22,7 @@ jobs:
           fetch-depth: 0
       - uses: pixta-dev/repository-mirroring-action@v1
         with:
-          target_repo_url: git@gitlab.com:whyour/qinglong.git
+          target_repo_url: git@gitlab.com:icocoding/qinglong.git
           ssh_private_key: ${{ secrets.GITLAB_SSH_PK }}
 
   to_gitee:
@@ -59,7 +59,7 @@ jobs:
           GITHUB_REPO: github.com/${{ github.repository_owner }}/qinglong-static
           GITHUB_BRANCH: ${{ github.ref_name }}
           REPO_GITEE: git@gitee.com:whyour/qinglong-static.git
-          REPO_GITLAB: git@gitlab.com:whyour/qinglong-static.git
+          REPO_GITLAB: git@gitlab.com:icocoding/qinglong-static.git
           PRIVATE_KEY: ${{ secrets.GITLAB_SSH_PK }}
         run: |
           mkdir -p tmp
@@ -76,10 +76,10 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           export GIT_SSH_COMMAND="ssh -v -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no -l git"
-          git remote add gitee "${REPO_GITEE}"
+          # git remote add gitee "${REPO_GITEE}"
           git remote add gitlab "${REPO_GITLAB}"
           git gc
-          git push --force --quiet gitee ${GITHUB_BRANCH}:${GITHUB_BRANCH}
+          # git push --force --quiet gitee ${GITHUB_BRANCH}:${GITHUB_BRANCH}
           git push --force --quiet gitlab ${GITHUB_BRANCH}:${GITHUB_BRANCH}
 
   build:
@@ -163,8 +163,8 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=registry,ref=whyour/qinglong:cache
-          cache-to: type=registry,ref=whyour/qinglong:cache,mode=max
+          cache-from: type=registry,ref=icocoding/qinglong:cache
+          cache-to: type=registry,ref=icocoding/qinglong:cache,mode=max
 
       - name: Image digest
         run: |
@@ -226,9 +226,9 @@ jobs:
           context: .
           file: ./docker/310.Dockerfile
           push: true
-          tags: whyour/qinglong:python3.10
-          cache-from: type=registry,ref=whyour/qinglong:cache-python3.10
-          cache-to: type=registry,ref=whyour/qinglong:cache-python3.10,mode=max
+          tags: icocoding/qinglong:python3.10
+          cache-from: type=registry,ref=icocoding/qinglong:cache-python3.10
+          cache-to: type=registry,ref=icocoding/qinglong:cache-python3.10,mode=max
 
       - name: Image digest
         run: |

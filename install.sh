@@ -64,6 +64,7 @@ install_qinglong() {
 
     read -p "请设置Github用户名(默认:icocoding 回车):" maintainer
     read -p "请设置Github仓库分支(默认:develop 回车):" git_branch
+    read -p "请设置主机端口(默认:5700 回车):" panel_port
     read -p "请设置数据目录(默认:当前目录下 ql-data 回车):" data_path
 
     if [ -z "$maintainer" ]; then
@@ -72,10 +73,14 @@ install_qinglong() {
     if [ -z "$git_branch" ]; then
         git_branch="develop"
     fi
+    if [ -z "$panel_port" ]; then
+        panel_port=5700
+    fi
     if [ -z "$data_path" ]; then
         data_path="ql-data"
     fi
     echo -e "${yellow} Github: ${maintainer}/qinglong/${git_branch} ${plain}"
+    echo -e "${yellow} 主机端口: $panel_port ${plain}"
     echo -e "${yellow} 数据目录: ${data_path} ${plain}"
     read -p "确认是否安装?[y/n]": config_confirm
     if [[ x"${config_confirm}" == x"y" || x"${config_confirm}" == x"Y" ]]; then
@@ -118,7 +123,7 @@ install_qinglong() {
 
     docker run -dit \
         --name qinglong \
-        --hostname qinglong -p 5700:5700 \
+        --hostname qinglong -p ${panel_port}:5700 \
         -v ${data_path}:/ql/data \
         --restart always ${maintainer}/qinglong
 

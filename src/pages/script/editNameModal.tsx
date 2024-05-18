@@ -72,16 +72,16 @@ const EditScriptNameModal = ({
     return false;
   };
 
-  const typeChange = (e) => {
+  const typeChange = (e : any) => {
     setType(e.target.value);
   };
 
-  const getDirs = (data) => {
+  const getDirs = (data: any[]) => {
     for (const item of data) {
       if (item.children && item.children.length > 0) {
         item.children = item.children
-          .filter((x) => x.type === 'directory')
-          .map((x) => ({ ...x, disabled: false }));
+          .filter((x: { type: string; }) => x.type === 'directory')
+          .map((x: any) => ({ ...x, disabled: false }));
         getDirs(item.children);
       }
     }
