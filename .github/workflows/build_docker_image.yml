@@ -40,24 +40,24 @@ jobs:
           pnpm build:back
 
       - uses: actions/checkout@v2
+        id: zip_static
       - name: Zip the file
         run: |
           zip -r qinglong_static.zip static
-          export PUBLISH_NOTE=$(cat version.yaml)
-          export TAG_NAME=$(date +'%Y%m%d%H%M%S')
+          echo "::set-output PUBLISH_NOTE=$(cat version.yaml)::"
+          echo "::set-output TAG_NAME=$(date +'%Y%m%d%H%M%S')::"
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
         with:
-          tag_name: ${{ TAG_NAME }}
-          release_name: Release ${{ TAG_NAME }}
+          tag_name: ${{ steps.zip_static.outputs.TAG_NAME }}
+          release_name: Release ${{ steps.zip_static.outputs.TAG_NAME }}
           draft: true
           prerelease: false
           body: |
-            ${{ PUBLISH_NOTE }}
+            ${{ steps.zip_static.outputs.PUBLISH_NOTE }}
 
       - uses: actions/upload-release-asset@v1.0.1
         env:
