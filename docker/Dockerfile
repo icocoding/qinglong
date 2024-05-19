@@ -29,6 +29,7 @@ FROM python:3.11-alpine
 ARG QL_MAINTAINER="icocoding"
 LABEL maintainer="${QL_MAINTAINER}"
 ARG QL_BRANCH=develop
+ARG LATEST_VERSION='xxx'
 ENV PNPM_HOME=/root/.local/share/pnpm \
   PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/root/.local/share/pnpm:/root/.local/share/pnpm/global/5/node_modules:$PNPM_HOME \
   NODE_PATH=/usr/local/bin:/usr/local/pnpm-global/5/node_modules:/usr/local/lib/node_modules:/root/.local/share/pnpm/global/5/node_modules \
@@ -37,7 +38,8 @@ ENV PNPM_HOME=/root/.local/share/pnpm \
   PS1="\u@\h:\w \$ " \
   QL_DIR=/ql \
   QL_BRANCH=${QL_BRANCH} \
-  QL_MAINTAINER=${QL_MAINTAINER}
+  QL_MAINTAINER=${QL_MAINTAINER} \
+  LATEST_VERSION=${LATEST_VERSION}
 
 VOLUME /ql/data
 
@@ -84,9 +86,10 @@ COPY --from=builder ${BUILD_DIR}/. ${QL_DIR}/
 RUN cd ${QL_DIR} \
   && chmod 777 ${QL_DIR}/shell/*.sh \
   && chmod 777 ${QL_DIR}/docker/*.sh \
-  && last_version=$(curl -Ls "https://api.github.com/repos/${QL_MAINTAINER}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
-  && wget -N --no-check-certificate -O qinglong_static.zip https://github.com/${QL_MAINTAINER}/qinglong/releases/download/${last_version}/qinglong-static.zip \
-  && unzip -o qinglong_static.zip -d /static \
+  # && last_version=$(curl -Ls "https://api.github.com/repos/${QL_MAINTAINER}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
+  && wget -N --no-check-certificate -O qinglong_static.zip https://github.com/${QL_MAINTAINER}/qinglong/releases/download/${LATEST_VERSION}/qinglong_static.zip \
+  && unzip -o qinglong_static.zip -d static \
+  && ls static \
   && rm -f qinglong_static.zip
 
 RUN bash -c 'cat ${QL_DIR}/.env'

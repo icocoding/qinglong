@@ -57,10 +57,6 @@ install_base() {
     else
         apt install wget curl tar -y
     fi
-}
-
-install_qinglong() {
-
 
     read -p "请设置Github用户名(默认:icocoding 回车):" maintainer
     read -p "请设置Github仓库分支(默认:develop 回车):" git_branch
@@ -79,6 +75,7 @@ install_qinglong() {
     if [ -z "$data_path" ]; then
         data_path="ql-data"
     fi
+
     echo -e "${yellow} Github: ${maintainer}/qinglong/${git_branch} ${plain}"
     echo -e "${yellow} 主机端口: $panel_port ${plain}"
     echo -e "${yellow} 数据目录: ${data_path} ${plain}"
@@ -90,6 +87,13 @@ install_qinglong() {
         exit 1
     fi
 
+    export maintainer=$maintainer
+    export git_branch=$git_branch
+    export panel_port=$panel_port
+    export data_path=$data_path
+}
+
+function downloadDockerfile() {
     dockerfile="Dockerfile"
     if [ -e "$dockerfile" ]; then
         echo -e "${red}请删除Dockerfile再执行脚本${plain}"
@@ -106,12 +110,26 @@ install_qinglong() {
         echo -e "${red}下载 Dockerfile, 请确保你的服务器能够下载 Github 的文件${plain}"
         exit 1
     fi
+}
 
-    echo -e "${green}docker build ...${plain}"
+install_qinglong() {
+
+    if [[ -f "Dockerfile" ]]; then
+        echo -e "${yellow}Dockerfile文件已存在${plain}"
+    else
+        echo -e "${green}开始下载docker file ...${plain}"
+        downloadDockerfile
+    fi
+
+    echo -e "${green}build docker qinglong ...${plain}"
     
+    latest_version=$(curl -Ls "https://api.github.com/repos/${maintainer}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+    echo -e "${green}最新版本: ${latest_version}${plain}"
+
     docker build --pull \
         --build-arg QL_MAINTAINER=${maintainer} \
         --build-arg QL_BRANCH=${git_branch} \
+        --build-arg LATEST_VERSION=${latest_version} \
         -t ${maintainer}/qinglong .
     
     echo -e "${green}docker build success and run ...${plain}"
@@ -131,6 +149,8 @@ install_qinglong() {
     echo -e "${green}使用 docker logs -f qinglong 查看安装日志${plain}"
 }
 
+
+
 echo -e "${green}开始安装${plain}"
 install_base
-install_qinglong $1
+install_qinglong
