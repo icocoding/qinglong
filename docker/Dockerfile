@@ -88,8 +88,7 @@ RUN cd ${QL_DIR} \
   && chmod 777 ${QL_DIR}/docker/*.sh \
   # && last_version=$(curl -Ls "https://api.github.com/repos/${QL_MAINTAINER}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/') \
   && wget -N --no-check-certificate -O qinglong_static.zip https://github.com/${QL_MAINTAINER}/qinglong/releases/download/${LATEST_VERSION}/qinglong_static.zip \
-  && unzip -o qinglong_static.zip -d static \
-  && ls static \
+  && unzip -o qinglong_static.zip \
   && rm -f qinglong_static.zip
 
 RUN bash -c 'cat ${QL_DIR}/.env'
