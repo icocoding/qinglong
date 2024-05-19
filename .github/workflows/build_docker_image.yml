@@ -50,7 +50,7 @@ jobs:
         id: zip_static
         run: |
           STATIC_PATH=${{ steps.build_front_and_back.outputs.STATIC_PATH }}
-          zip -r qinglong_static.zip ${STATIC_PATH}/*
+          zip -r qinglong_static.zip static/*
           
           echo "::set-output name=ZIP_FILE_PATH::$(pwd)/qinglong_static.zip"
       - name: Create Release
