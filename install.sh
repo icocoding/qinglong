@@ -126,7 +126,7 @@ install_qinglong() {
     latest_version=$(curl -Ls "https://api.github.com/repos/${maintainer}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
     echo -e "${green}最新版本: ${latest_version}${plain}"
 
-    docker build --pull \
+    docker build --no-cache \
         --build-arg QL_MAINTAINER=${maintainer} \
         --build-arg QL_BRANCH=${git_branch} \
         --build-arg LATEST_VERSION=${latest_version} \
