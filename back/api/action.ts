@@ -51,9 +51,9 @@ export default (app: Router) => {
         fs.mkdirSync(path.dirname(logPath), { recursive: true });
 
         const actionService = Container.get(ActionService);
-        const content =  await actionService.runAction(jsPath, logPath, req.body);
+        const result =  await actionService.runAction(jsPath, logPath, req.body);
 
-        return res.json(content);
+        return res.json({ code: 0, result });
       } catch (e) {
         return res.json({ code: 1, error: e });
       }
