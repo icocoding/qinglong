@@ -21,18 +21,18 @@
     3. 优化：新增文件、文件夹后更新目录树
     ```
 
- - 2024.08.1
+ - 2024.08.2
     > 2024-08-20 13:40
 
     **更新内容：**
     1. 增加：接口调用，/api/actions/:actionName
     - actionName 是放在脚本 actions 目录下action文件夹名, 必须包含index.js文件
         ```js
-        module.exports.main = async function(params) {
-            console.log('params', params)
+        module.exports = async function({args}) {
+            console.log('args', args)
             return {
-                backName: 'hi ' + params.name,
-                params
+                backName: 'hi ' + args.name,
+                args
             }
         }
         ```

@@ -1,15 +1,15 @@
-version: 2024.08.1
+version: 2024.08.2
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
 publishTime: 2024-08-20 13:40
 changeLog: |
   1. 增加：接口调用，/api/actions/:actionName
   - actionName 是放在脚本 actions 目录下action文件夹名, 必须包含index.js文件
     ```js
-    module.exports.main = async function(params) {
-        console.log('params', params)
+    module.exports = async function({args}) {
+        console.log('args', args)
         return {
-            backName: 'hi ' + params.name,
-            params
+            backName: 'hi ' + args.name,
+            args
         }
     }
     ```

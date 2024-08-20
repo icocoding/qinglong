@@ -6,6 +6,8 @@ import ScheduleService, { TaskCallbacks } from './schedule';
 import dayjs from 'dayjs';
 import * as fs from 'fs/promises';
 
+import { rmPath } from '../config/util';
+
 @Service()
 export default class ActionService {
   constructor(
@@ -24,7 +26,7 @@ export default class ActionService {
     console.log('--> Time:', ${execTime}, ' <--');
     console.log('--> Params:', params, ' <--');
     const target = require('${filePath}');
-    target.main(params).then(res => {
+    target({args: params}).then(res => {
       console.log('--> Success:', res, ' <--');
       fs.writeFileSync('${resultJsonPath}', JSON.stringify(res));
     }).catch(err => {
@@ -49,7 +51,7 @@ export default class ActionService {
             onEnd: async (cp, endTime, diff) => {
               const fileContent = await fs.readFile(resultJsonPath, 'utf8');
               resolve({
-                result: JSON.parse(fileContent),
+                ...JSON.parse(fileContent),
                 takeTime: diff,
               });
             },
@@ -62,15 +64,19 @@ export default class ActionService {
             },
           },
           { command },
-          'end',
+          'start',
         )
       } catch (error) {
         reject({ code: 101, msg: error })
       }
     }).finally(async() => {
       // 删除临时文件
-      await fs.unlink(resultJsonPath);
-      await fs.unlink(execFilePath);
+      try {
+        await rmPath(execFilePath);
+        await rmPath(resultJsonPath);
+      } catch (error) {
+        console.error('删除临时文件', error)
+      }
     })
   }
 }

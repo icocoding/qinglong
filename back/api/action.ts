@@ -24,7 +24,7 @@ export default (app: Router) => {
       }),
     }),
     async (req: Request, res: Response, next: NextFunction) => {
-      res.status(405).send({ code: 405, data: '禁止访问' });
+      res.status(405).send('禁止访问');
     },
   );
   // jsName 不要包含 .js
@@ -43,7 +43,7 @@ export default (app: Router) => {
         const jsPath = path.resolve(`${config.scriptPath}/actions/${actionName}/index.js`);
         console.log(jsPath)
         if (!fs.existsSync(jsPath)) {
-          return res.send({ code: 404, data: '数据不存在' });
+          return res.json({ code: 404, data: '数据不存在' });
         }
 
         const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
@@ -53,9 +53,9 @@ export default (app: Router) => {
         const actionService = Container.get(ActionService);
         const content =  await actionService.runAction(jsPath, logPath, req.body);
 
-        return res.send({ code: 0, data: content });
+        return res.json(content);
       } catch (e) {
-        return res.send({ code: 1, error: e });
+        return res.json({ code: 1, error: e });
       }
     },
   );
