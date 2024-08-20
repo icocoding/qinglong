@@ -25,8 +25,8 @@
     > 2024-08-20 13:40
 
     **更新内容：**
-    1. 增加：接口调用，/api/actions/:jsName
-    - jsName 是放在脚本 actions 目录下js文件名,不包含.js后缀
+    1. 增加：接口调用，/api/actions/:actionName
+    - actionName 是放在脚本 actions 目录下action文件夹名, 必须包含index.js文件
         ```js
         module.exports.main = async function(params) {
             console.log('params', params)

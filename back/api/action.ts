@@ -29,25 +29,25 @@ export default (app: Router) => {
   );
   // jsName 不要包含 .js
   route.post(
-    '/:jsName',
+    '/:actionName',
     celebrate({
       params: Joi.object({
-        jsName: Joi.string().required(),
+        actionName: Joi.string().required(),
       }),
       body: Joi.any(),
     }),
     async (req: Request, res: Response, next: NextFunction) => {
       const logger: Logger = Container.get('logger');
       try {
-        let jsName = req.params.jsName;
-        const jsPath = path.resolve(`${config.scriptPath}/actions/${jsName}.js`);
+        let actionName = req.params.actionName;
+        const jsPath = path.resolve(`${config.scriptPath}/actions/${actionName}/index.js`);
         console.log(jsPath)
         if (!fs.existsSync(jsPath)) {
           return res.send({ code: 404, data: '数据不存在' });
         }
 
         const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
-        const logPath = path.resolve(`${config.logPath}/actions/${jsName}/${execTime}.log`);
+        const logPath = path.resolve(`${config.logPath}/actions/${actionName}/${execTime}.log`);
         fs.mkdirSync(path.dirname(logPath), { recursive: true });
 
         const actionService = Container.get(ActionService);
