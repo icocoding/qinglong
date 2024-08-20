@@ -18,15 +18,18 @@ export default class ActionService {
   public async runAction(filePath: string, logPath: string, params: any) {
 
     const execTime = dayjs().format('YYYYMMDDHHmmss.SSS');
-    const execFilePath = join(filePath + execTime + `.js`);
-    const resultJsonPath = join(filePath + execTime + `.json`);
+    const execPath = join(filePath.substring(0, filePath.lastIndexOf('/')), '.run', execTime);
+    await fs.mkdir(execPath, { recursive: true });
+    const execFilePath = join(execPath + `.js`);
+    const resultJsonPath = join(execPath + `.json`);
     const script = `
     const fs = require('fs');
     const params = ${JSON.stringify(params)};
     console.log('--> Time:', ${execTime}, ' <--');
     console.log('--> Params:', params, ' <--');
     const target = require('${filePath}');
-    target({args: params}).then(res => {
+    const fn = target.main || target;
+    fn({args: params}).then(res => {
       console.log('--> Success:', res, ' <--');
       fs.writeFileSync('${resultJsonPath}', JSON.stringify(res));
     }).catch(err => {

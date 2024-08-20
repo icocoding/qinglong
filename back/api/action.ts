@@ -6,7 +6,6 @@ import config from '../config';
 import { celebrate, Joi } from 'celebrate';
 import path from 'path';
 import ActionService from '../services/action';
-import { error } from 'console';
 import dayjs from 'dayjs';
 const route = Router();
 /**
