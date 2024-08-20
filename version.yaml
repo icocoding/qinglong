@@ -1,7 +1,25 @@
-version: 2024.05.0
+version: 2024.08.0
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
-publishTime: 2024-05-17 21:40
+publishTime: 2024-08-20 13:40
 changeLog: |
-  1. 增加：脚本保存备份，防止异常时丢失脚本😭
-  2. 优化：编辑脚本时，Command+S(Ctrl+S)直接保存，去掉提示框
-  3. 优化：新增文件、文件夹后更新目录树
+  1. 增加：接口调用，/api/actions/:jsName
+  - jsName 是放在脚本 actions 目录下js文件名,不包含.js后缀
+    ```js
+    module.exports.main = async function(params) {
+        console.log('params', params)
+        return {
+            backName: 'hi ' + params.name,
+            params
+        }
+    }
+    ```
+  - TODO：增加接口调用权限验证
+
+history: |
+  version: 2024.05.0
+  changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
+  publishTime: 2024-05-17 21:40
+  changeLog: |
+    1. 增加：脚本保存备份，防止异常时丢失脚本😭
+    2. 优化：编辑脚本时，Command+S(Ctrl+S)直接保存，去掉提示框
+    3. 优化：新增文件、文件夹后更新目录树dxcv 

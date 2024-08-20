@@ -119,7 +119,7 @@ export default class UserService {
       if (username === cUsername && password === cPassword) {
         const data = createRandomString(50, 100);
         const expiration = twoFactorActivated ? 60 : 20;
-        let token = jwt.sign({ data }, config.secret as any, {
+        let token = jwt.sign({ data, platform: 'icocoding' }, config.secret as any, {
           expiresIn: 60 * 60 * 24 * expiration,
           algorithm: 'HS384',
         });

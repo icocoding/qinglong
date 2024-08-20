@@ -41,11 +41,12 @@ export default ({ app }: { app: Application }) => {
       secret: config.secret,
       algorithms: ['HS384'],
     }).unless({
-      path: [...config.apiWhiteList, /^\/open\//],
+      path: [...config.apiWhiteList, /^\/api\/actions\//, /^\/open\//],
     }),
   );
 
   app.use((req: Request, res, next) => {
+    console.log('Request Path:', req.path);
     if (!req.headers) {
       req.platform = 'desktop';
     } else {
@@ -73,6 +74,10 @@ export default ({ app }: { app: Application }) => {
         }
       }
     }
+    // 不校验权限
+    if (req.path.startsWith('/api/actions/')) {
+      return next();
+    }
 
     const originPath = `${req.baseUrl}${req.path === '/' ? '' : req.path}`;
     if (
@@ -99,6 +104,7 @@ export default ({ app }: { app: Application }) => {
     next(err);
   });
 
+  // 处理初始化
   app.use(async (req, res, next) => {
     if (!['/api/user/init', '/api/user/notification/init'].includes(req.path)) {
       return next();

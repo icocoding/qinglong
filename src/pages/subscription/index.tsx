@@ -331,7 +331,7 @@ const Subscription = () => {
     setIsModalVisible(true);
   };
 
-  const onCheckChange = (e) => {
+  const onCheckChange = (e: any) => {
     deleteCheckRef.current = e.target.checked;
   };
 

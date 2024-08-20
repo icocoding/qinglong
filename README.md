@@ -20,3 +20,20 @@
     2. 优化：编辑脚本时，Command+S(Ctrl+S)直接保存，去掉提示框
     3. 优化：新增文件、文件夹后更新目录树
     ```
+
+ - 2024.08.0
+    > 2024-08-20 13:40
+
+    **更新内容：**
+    1. 增加：接口调用，/api/actions/:jsName
+    - jsName 是放在脚本 actions 目录下js文件名,不包含.js后缀
+        ```js
+        module.exports.main = async function(params) {
+            console.log('params', params)
+            return {
+                backName: 'hi ' + params.name,
+                params
+            }
+        }
+        ```
+    - TODO：增加接口调用权限验证

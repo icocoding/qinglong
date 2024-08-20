@@ -434,9 +434,11 @@ export default class CronService {
         }
         const logPath = `${uniqPath}/${logTime}.log`;
         const absolutePath = path.resolve(config.logPath, `${logPath}`);
-
+        const execCommand = this.makeCommand(cron);
+        console.log('execCommand', execCommand);
+        // spawn 调用 shell task.sh
         const cp = spawn(
-          `real_log_path=${logPath} no_delay=true ${this.makeCommand(cron)}`,
+          `real_log_path=${logPath} no_delay=true ${execCommand}`,
           { shell: '/bin/bash' },
         );
 

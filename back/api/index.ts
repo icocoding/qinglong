@@ -9,6 +9,7 @@ import open from './open';
 import dependence from './dependence';
 import system from './system';
 import subscription from './subscription';
+import action from './action';
 
 export default () => {
   const app = Router();
@@ -22,6 +23,7 @@ export default () => {
   dependence(app);
   system(app);
   subscription(app);
-
+  action(app);
+  
   return app;
 };
