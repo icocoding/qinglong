@@ -1,12 +1,11 @@
 import { Service, Inject } from 'typedi';
 import winston from 'winston';
-import { join } from 'path';
 import ScheduleService, { TaskCallbacks } from './schedule';
 
 import dayjs from 'dayjs';
 import * as fs from 'fs/promises';
 
-import { rmPath } from '../config/util';
+const vm = require('vm');
 
 @Service()
 export default class ActionService {
@@ -15,71 +14,54 @@ export default class ActionService {
     private scheduleService: ScheduleService,
   ) { }
 
-  public async runAction(filePath: string, logPath: string, params: any) {
-
+  public async runActionWithVM(filePath: string, logPath: string, params: any) {
+    async function appLog(message: string) {
+      return fs.appendFile(logPath, message + '\n', 'utf8');
+    }
     const execTime = dayjs().format('YYYYMMDDHHmmss.SSS');
-    const execPath = join(filePath.substring(0, filePath.lastIndexOf('/')), '.run', execTime);
-    await fs.mkdir(execPath, { recursive: true });
-    const execFilePath = join(execPath + `.js`);
-    const resultJsonPath = join(execPath + `.json`);
-    const script = `
-    const fs = require('fs');
-    const params = ${JSON.stringify(params)};
-    console.log('--> Time:', ${execTime}, ' <--');
-    console.log('--> Params:', params, ' <--');
-    const target = require('${filePath}');
-    const fn = target.main || target;
-    fn({args: params}).then(res => {
-      console.log('--> Success:', res, ' <--');
-      fs.writeFileSync('${resultJsonPath}', JSON.stringify(res));
-    }).catch(err => {
-      console.error('--> Error:', err, ' <--');
-      fs.writeFileSync('${resultJsonPath}', JSON.stringify(err));
-    }).finally(() => {
-      process.exit(0); // 正常退出
-    });
-`
-    await fs.writeFile(execFilePath, script);
-    const command = `node ${execFilePath}`;
-    console.log(command)
-    const that = this;
-    return new Promise(function (resolve, reject) {
-      try {
-        that.scheduleService.runTask(
-          command,
-          {
-            onStart: async(cp, startTime) => {
-              console.log('Start:', startTime.format('YYYY-MM-DD HH:mm:ss'));
-            },
-            onEnd: async (cp, endTime, diff) => {
-              const fileContent = await fs.readFile(resultJsonPath, 'utf8');
-              resolve({
-                ...JSON.parse(fileContent),
-                takeTime: diff,
-              });
-            },
-            onError: async (message: string) => {
-              reject({ code: 100, msg: message })
-            },
-            onLog: async(message) => {
-              console.log(message)
-              await fs.appendFile(logPath, `${message}`);
-            },
-          },
-          { command },
-          'start',
-        )
-      } catch (error) {
-        reject({ code: 101, msg: error })
+    const scriptContent = `
+      const fs = require('fs');
+      const params = ${JSON.stringify(params)};
+      console.log('--> Time:', ${execTime}, ' <--');
+      console.log('--> Params:', params, ' <--');
+      const target = require('${filePath}');
+      const fn = target.main || target;
+      const promise = fn({args: params});
+      promise;
+      `;
+    // 创建一个处理程序
+    const logHandler = {
+      get(target: any, propKey: string) {
+        // 拦截 'log' 方法
+        if (propKey === 'log' || propKey === 'error') {
+          return function() {
+            const arr = Array.from(arguments).map(x => typeof x == 'object' ? JSON.stringify(x) : x);
+            // 自定义处理 log 方法的行为
+            appLog(arr.join(' '))
+          };
+        }
+        // 对其他属性或方法的默认行为
+        return target[propKey];
       }
-    }).finally(async() => {
-      // 删除临时文件
-      try {
-        await rmPath(execFilePath);
-        await rmPath(resultJsonPath);
-      } catch (error) {
-        console.error('删除临时文件', error)
-      }
-    })
+    };
+
+    // 使用 Proxy 对象代理全局 console 对象
+    const proxiedConsole = new Proxy(console, logHandler);
+
+    // 创建一个脚本并将 Proxy 对象传递到上下文中
+    // 创建一个上下文，并将 proxiedConsole 替换到上下文中
+    const context = vm.createContext({ console: proxiedConsole, require: require, params });
+
+    // 编译和运行脚本
+    const scriptObj = new vm.Script(scriptContent);
+    const promise = scriptObj.runInContext(context);
+    try {
+      const result = await promise;
+      appLog('--> Success: \n' + JSON.stringify(result) + ' \n<--')
+      return result;
+    } catch (error) {
+      appLog('--> Error: ' + JSON.stringify(error) + ' <--')
+      throw error;
+    }
   }
 }

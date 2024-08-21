@@ -26,7 +26,7 @@ app
     await require('./loaders/db').default();
 
     Logger.debug(`✌️ 公共服务启动成功！`);
-    console.debug(`✌️ 公共服务启动成功！`);
+    console.debug(`✌️ 公共服务启动成功！ port: ${config.publicPort}`);
     process.send?.('ready');
   })
   .on('error', (err) => {

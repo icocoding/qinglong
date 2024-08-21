@@ -14,7 +14,7 @@ async function startServer() {
   app
     .listen(config.updatePort, () => {
       Logger.debug(`✌️ 更新服务启动成功！`);
-      console.debug(`✌️ 更新服务启动成功！`);
+      console.debug(`✌️ 更新服务启动成功！ port: ${config.updatePort}`);
       process.send?.('ready');
     })
     .on('error', (err) => {
