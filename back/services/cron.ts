@@ -553,20 +553,38 @@ export default class CronService {
     tabs.data.forEach((tab) => {
       const _schedule = tab.schedule && tab.schedule.split(/ +/);
       if (
-        tab.isDisabled === 1 ||
-        _schedule!.length !== 5 ||
-        tab.extra_schedules?.length
+        tab.isDisabled === 1
+         ||
+        _schedule!.length !== 5
+        //  ||
+        // tab.extra_schedules?.length
       ) {
-        crontab_string += '# ';
-        crontab_string += tab.schedule;
-        crontab_string += ' ';
-        crontab_string += this.makeCommand(tab);
-        crontab_string += '\n';
+        // crontab_string += '# ';
+        // crontab_string += tab.schedule;
+        // crontab_string += ' ';
+        // crontab_string += this.makeCommand(tab);
+        // crontab_string += '\n';
       } else {
         crontab_string += tab.schedule;
         crontab_string += ' ';
         crontab_string += this.makeCommand(tab);
         crontab_string += '\n';
+        if (tab.extra_schedules?.length) {
+          const extra_schedules = tab.extra_schedules
+          console.log('extra_schedules', extra_schedules)
+          for (let i = 0; i < extra_schedules.length; i++) {
+            const element = extra_schedules[i];
+            const _sch = element.schedule && element.schedule.split(/ +/);
+            if (
+              _sch!.length == 5
+            ) {
+              crontab_string += element.schedule;
+              crontab_string += ' ';
+              crontab_string += this.makeCommand(tab);
+              crontab_string += '\n';
+            }
+          }
+        }
       }
     });
 

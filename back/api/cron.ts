@@ -166,7 +166,24 @@ export default (app: Router) => {
       }
     },
   );
-
+  function checkCron(schedule: string, extra_schedules: any[]) {
+    const _schedule = schedule.split(/ +/);
+    if ( _schedule.length != 5 ) {
+      return { code: 400, message: 'param schedule error, 只能为5部分' };
+    }
+    if (extra_schedules && extra_schedules.length > 0) {
+      for (let i = 0; i < extra_schedules.length; i++) {
+        const element = extra_schedules[i];
+        const _sch= element.schedule && element.schedule.split(/ +/);
+        if (
+          _sch!.length != 5
+        ) {
+          return { code: 400, message: 'param extra_schedules error, 只能为5部分' };
+        }
+      }
+    }
+    return { code: 0 }
+  }
   route.post(
     '/',
     celebrate({
@@ -185,6 +202,10 @@ export default (app: Router) => {
       const logger: Logger = Container.get('logger');
       try {
         if (cron_parser.parseExpression(req.body.schedule).hasNext()) {
+          const result = checkCron(req.body.schedule, req.body.extra_schedules);
+          if (result.code != 0) {
+            return res.send(result);
+          }
           const cronService = Container.get(CronService);
           const data = await cronService.create(req.body);
           return res.send({ code: 200, data });
@@ -349,6 +370,10 @@ export default (app: Router) => {
           !req.body.schedule ||
           cron_parser.parseExpression(req.body.schedule).hasNext()
         ) {
+          const result = checkCron(req.body.schedule, req.body.extra_schedules);
+          if (result.code != 0) {
+            return res.send(result);
+          }
           const cronService = Container.get(CronService);
           const data = await cronService.update(req.body);
           return res.send({ code: 200, data });

@@ -15,7 +15,7 @@ export default class ActionService {
   ) { }
 
   public async runActionWithVM2(jsFilePath: string, logPath: string, params: any) {
-    this.logger.log("执行js脚本", jsFilePath)
+    this.logger.info("执行js脚本", jsFilePath)
     // 创建一个新的 NodeVM 实例
     const vm = new NodeVM({
       console: 'redirect', // 重定向 console 输出
