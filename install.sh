@@ -57,11 +57,12 @@ install_base() {
     else
         apt install wget curl tar -y
     fi
-
+    secret=$(LC_CTYPE=C tr -dc 'A-Za-z0-9' </dev/urandom | head -c 8)
     read -p "请设置Github用户名(默认:icocoding 回车):" maintainer
     read -p "请设置Github仓库分支(默认:develop 回车):" git_branch
     read -p "请设置主机端口(默认:5700 回车):" panel_port
     read -p "请设置数据目录(默认:当前目录下 ql-data 回车):" data_path
+    read -p "请设置JWT密钥(默认:$secret 回车):" new_secret
 
     if [ -z "$maintainer" ]; then
         maintainer="icocoding"
@@ -75,10 +76,14 @@ install_base() {
     if [ -z "$data_path" ]; then
         data_path="ql-data"
     fi
+    if [ -n "$new_secret" ]; then
+        secret=$new_secret
+    fi
 
     echo -e "${yellow} Github: ${maintainer}/qinglong/${git_branch} ${plain}"
     echo -e "${yellow} 主机端口: $panel_port ${plain}"
     echo -e "${yellow} 数据目录: ${data_path} ${plain}"
+    echo -e "${yellow} JWT密钥: ${secret} ${plain}"
     read -p "确认是否安装?[y/n]": config_confirm
     if [[ x"${config_confirm}" == x"y" || x"${config_confirm}" == x"Y" ]]; then
         echo -e "${green}开始安装...${plain}"
@@ -91,6 +96,7 @@ install_base() {
     export git_branch=$git_branch
     export panel_port=$panel_port
     export data_path=$data_path
+    export secret=$secret
 }
 
 function downloadDockerfile() {
@@ -142,6 +148,7 @@ install_qinglong() {
     docker run -dit \
         --name qinglong \
         --hostname qinglong -p ${panel_port}:5700 \
+        -e SECRET=${secret} \
         -v ${data_path}:/ql/data \
         --restart always ${maintainer}/qinglong
 
