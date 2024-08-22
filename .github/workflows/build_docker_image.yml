@@ -46,6 +46,9 @@ jobs:
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
           changeLog=$(awk '/changeLog: \|/ {f=1;next} f && /^[[:space:]]*[^[:space:]]/ {print; if (/^[[:space:]]*history:/) exit}' version.yaml | sed '/^[[:space:]]*history:/,$d;')
+          echo "CHANGE_LOG<<EOF" >> $GITHUB_ENV
+          echo "$changeLog" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
           echo "::set-output name=CHANGE_LOG::${changeLog}"
           tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}')
           echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
