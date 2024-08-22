@@ -1,67 +1,58 @@
 import { Service, Inject } from 'typedi';
-import winston from 'winston';
-import ScheduleService, { TaskCallbacks } from './schedule';
+import winston, { Container } from 'winston';
 
 import dayjs from 'dayjs';
 import * as fs from 'fs/promises';
+import path from 'path';
 
 const vm = require('vm');
+const { NodeVM } = require('vm2');
 
 @Service()
 export default class ActionService {
   constructor(
     @Inject('logger') private logger: winston.Logger,
-    private scheduleService: ScheduleService,
   ) { }
 
-  public async runActionWithVM(filePath: string, logPath: string, params: any) {
-    async function appLog(message: string) {
-      return fs.appendFile(logPath, message + '\n', 'utf8');
+  public async runActionWithVM2(jsFilePath: string, logPath: string, params: any) {
+    this.logger.log("执行js脚本", jsFilePath)
+    // 创建一个新的 NodeVM 实例
+    const vm = new NodeVM({
+      console: 'redirect', // 重定向 console 输出
+      // console: 'inherit', // 继承主环境的 console
+      sandbox: {
+        args: params
+      }, // 沙箱中的变量
+      require: {
+          external: true, // 允许加载外部模块
+          builtin: ['fs', 'path'], // 允许使用内建模块
+          root: path.dirname(jsFilePath), // 允许访问的脚本目录
+      },
+      timeout: 30_000, // 运行脚本的超时时间 30s
+    });
+    async function appendLog(...messages: any[]) {
+      // const arr = Array.from(arguments).map(x => typeof x == 'object' ? JSON.stringify(x) : x);
+      fs.appendFile(logPath, messages.join(' ') + '\n', 'utf8').then(() => {});
     }
+    // 监听来自沙箱的日志
+    vm.on('console.log', (message: any) => appendLog(message));
+    vm.on('console.error', (message: any) => appendLog(message));
     const execTime = dayjs().format('YYYYMMDDHHmmss.SSS');
-    const scriptContent = `
-      const fs = require('fs');
-      const params = ${JSON.stringify(params)};
-      console.log('--> Time:', ${execTime}, ' <--');
-      console.log('--> Params:', params, ' <--');
-      const target = require('${filePath}');
-      const fn = target.main || target;
-      const promise = fn({args: params});
-      promise;
-      `;
-    // 创建一个处理程序
-    const logHandler = {
-      get(target: any, propKey: string) {
-        // 拦截 'log' 方法
-        if (propKey === 'log' || propKey === 'error') {
-          return function() {
-            const arr = Array.from(arguments).map(x => typeof x == 'object' ? JSON.stringify(x) : x);
-            // 自定义处理 log 方法的行为
-            appLog(arr.join(' '))
-          };
-        }
-        // 对其他属性或方法的默认行为
-        return target[propKey];
-      }
-    };
-
-    // 使用 Proxy 对象代理全局 console 对象
-    const proxiedConsole = new Proxy(console, logHandler);
-
-    // 创建一个脚本并将 Proxy 对象传递到上下文中
-    // 创建一个上下文，并将 proxiedConsole 替换到上下文中
-    const context = vm.createContext({ console: proxiedConsole, require: require, params });
-
-    // 编译和运行脚本
-    const scriptObj = new vm.Script(scriptContent);
-    const promise = scriptObj.runInContext(context);
     try {
-      const result = await promise;
-      appLog('--> Success: \n' + JSON.stringify(result) + ' \n<--')
+      appendLog('--> Time:', execTime, ' <--');
+      appendLog('--> Params:', JSON.stringify(params), ' <--');
+      // 在沙箱中加载并运行一个脚本文件
+      const runner = vm.runFile(jsFilePath);
+      const result = await runner({
+        args: params
+      });
+      appendLog('--> Success: \n' + JSON.stringify(result) + ' \n<--')
       return result;
     } catch (error) {
-      appLog('--> Error: ' + JSON.stringify(error) + ' <--')
+      appendLog('--> Error: ' + JSON.stringify(error) + ' <--')
       throw error;
+    } finally {
+      appendLog('--> End: ' + '' + ' <--')
     }
   }
 }
