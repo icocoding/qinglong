@@ -45,7 +45,7 @@ jobs:
           pnpm build:front
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
-          changeLog=$(awk '/changeLog: \|/ {f=1;next} f {print; if (/^[[:space:]]*3\./) exit}' version.yaml | sed 's/^[[:space:]]*//')
+          changeLog=$(awk '/changeLog: \|/ {f=1;next} f && /^[[:space:]]*[^[:space:]]/ {print; if (/^[[:space:]]*history:/) exit}' version.yaml | sed '/^[[:space:]]*history:/,$d;')
           echo "::set-output name=CHANGE_LOG::${changeLog}"
           tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}')
           echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
@@ -65,8 +65,8 @@ jobs:
         with:
           tag_name: ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
           release_name: Release ${{ steps.build_front_and_back.outputs.PUBLISH_TAG_NAME }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
           body: ${{ steps.build_front_and_back.outputs.CHANGE_LOG }}
 
       - uses: actions/upload-release-asset@v1.0.1
