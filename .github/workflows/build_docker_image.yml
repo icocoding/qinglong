@@ -29,12 +29,13 @@ jobs:
         with:
           version: "8.3.1"
 
-      - uses: actions/setup-node@v4
-        with:
-          cache: "pnpm"
-
       - name: Install dependencies
         run: pnpm install
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: "pnpm"
 
       - name: build front and back
         id: build_front_and_back
