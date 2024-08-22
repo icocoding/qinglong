@@ -31,7 +31,6 @@ export default class ActionService {
       timeout: 30_000, // 运行脚本的超时时间 30s
     });
     async function appendLog(...messages: any[]) {
-      // const arr = Array.from(arguments).map(x => typeof x == 'object' ? JSON.stringify(x) : x);
       fs.appendFile(logPath, messages.join(' ') + '\n', 'utf8').then(() => {});
     }
     // 监听来自沙箱的日志
