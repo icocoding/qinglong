@@ -22,7 +22,7 @@ app.get('/api/health', (req, res) => {
 
 app
   .listen(config.publicPort, async () => {
-    await require('./loaders/sentry').default({ expressApp: app });
+    // await require('./loaders/sentry').default({ expressApp: app });
     await require('./loaders/db').default();
 
     Logger.debug(`✌️ 公共服务启动成功！`);

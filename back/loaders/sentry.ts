@@ -18,7 +18,7 @@ export default async ({ expressApp }: { expressApp: Application }) => {
     dsn: 'https://8b5c84cfef3e22541bc84de0ed00497b@o1098464.ingest.sentry.io/6122819',
     integrations: [
       new Sentry.Integrations.Http({ tracing: true }),
-      // new Sentry.Integrations.Express({ app: expressApp }),
+      new Sentry.Integrations.Express({ app: expressApp }),
     ],
     tracesSampleRate: 0.8,
     release: version,

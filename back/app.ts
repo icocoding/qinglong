@@ -10,7 +10,7 @@ async function startServer() {
 
   await require('./loaders/initFile').default();
 
-  await require('./loaders/sentry').default({ expressApp: app });
+  // await require('./loaders/sentry').default({ expressApp: app });
 
   await require('./loaders/app').default({ expressApp: app });
 
