@@ -1,4 +1,4 @@
-version: 2024.08.5
+version: 2024.08.6
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
 publishTime: 2024-08-20 13:40
 changeLog: |
@@ -15,6 +15,7 @@ changeLog: |
     ```
   - TODO：增加接口调用权限验证
   - 采用VM2执行接口js脚本
+  2. FIX: 定时任务规则不生效问题
 
 history: |
   version: 2024.05.0
