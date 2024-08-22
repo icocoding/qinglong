@@ -33,10 +33,12 @@ jobs:
         with:
           cache: "pnpm"
 
+      - name: Install dependencies
+        run: pnpm install
+
       - name: build front and back
         id: build_front_and_back
         run: |
-          pnpm install
           pnpm build:front
           pnpm build:back
           ls static
