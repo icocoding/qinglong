@@ -41,7 +41,7 @@ jobs:
         id: build_front_and_back
         run: |
           pnpm build:front
-          pnpm build:back
+          # pnpm build:back
           ls static
           echo "::set-output name=STATIC_PATH::$(pwd)/static"
           changeLog=$(awk '/changeLog: \|/ {f=1;next} f {print; if (/^[[:space:]]*3\./) exit}' version.yaml | sed 's/^[[:space:]]*//')
