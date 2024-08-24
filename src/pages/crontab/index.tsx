@@ -36,6 +36,8 @@ import {
   PlusOutlined,
   UnorderedListOutlined,
   CheckOutlined,
+  ReloadOutlined,
+  FileAddOutlined,
 } from '@ant-design/icons';
 import config from '@/utils/config';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -392,7 +394,7 @@ const Crontab = () => {
         if (code === 200) {
           const { data, total } = _data;
           setValue(
-            data.map((x) => {
+            data.map((x: any) => {
               return {
                 ...x,
                 nextRunTime: getCrontabsNextDate(x.schedule, x.extra_schedules),
@@ -864,8 +866,8 @@ const Crontab = () => {
         if (code === 200) {
           setCronViews(data);
           const firstEnableView = data
-            .filter((x) => !x.isDisabled)
-            .map((x) => ({
+            .filter((x: any) => !x.isDisabled)
+            .map((x: any) => ({
               ...x,
               name: x.name === '全部任务' ? intl.get('全部任务') : x.name,
             }));
@@ -913,9 +915,20 @@ const Crontab = () => {
           onChange={(e) => setSearchValue(e.target.value)}
           onSearch={onSearch}
         />,
-        <Button key="2" type="primary" onClick={() => addCron()}>
-          {intl.get('创建任务')}
-        </Button>,
+        <Tooltip title={intl.get('创建任务')}>
+          <Button key="2" type="primary" onClick={() => addCron()}
+            icon={ <PlusOutlined /> }
+          >
+          </Button>
+        </Tooltip>,
+        <Tooltip title={'刷新列表'}>
+          <Button key="3" 
+            type="primary" 
+            onClick={() => getCrons()}
+            icon={ <ReloadOutlined /> }
+            >
+          </Button>
+        </Tooltip>,
       ]}
       header={{
         style: headerStyle,

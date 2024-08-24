@@ -60,6 +60,7 @@ install_before() {
         echo -e "${red}不删除${plain}"
     fi
 }
+
 install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install wget curl tar -y
@@ -88,9 +89,10 @@ install_base() {
     if [ -n "$new_secret" ]; then
         secret=$new_secret
     fi
-
+    api_port=$(($panel_port + 10))
     echo -e "${yellow} Github: ${maintainer}/qinglong/${git_branch} ${plain}"
     echo -e "${yellow} 主机端口: $panel_port ${plain}"
+    echo -e "${yellow} API端口: $api_port ${plain}"
     echo -e "${yellow} 数据目录: ${data_path} ${plain}"
     echo -e "${yellow} JWT密钥: ${secret} ${plain}"
     read -p "确认是否安装?[y/n]": config_confirm
@@ -156,7 +158,9 @@ install_qinglong() {
 
     docker run -dit \
         --name qinglong \
-        --hostname qinglong -p ${panel_port}:5700 \
+        --hostname qinglong \
+        -p ${panel_port}:5700 \
+        -p ${api_port}:5800 \
         -e SECRET=${secret} \
         -v ${data_path}:/ql/data \
         --restart always ${maintainer}/qinglong

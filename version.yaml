@@ -1,6 +1,6 @@
-version: 2024.08.9
+version: 2024.08.10
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
-publishTime: 2024-08-24 13:40
+publishTime: 2024-08-24 15:40
 changeLog: |
   1. FEAT: 脚本管理页面增加`刷新目录`功能
   2. FEAT: 脚本管理页面增加`解压压缩包`功能
@@ -8,6 +8,7 @@ changeLog: |
   4. FIX: 创建脚本默认代入当前选中的目录
   5. FIX: 查看脚本时, 脚本内容为黑色, 不启用代码风格
   6. FIX: 调整脚本管理页面的编辑、重命名、删除等图标禁用逻辑
+  7. FIX: 日志管理页面、定时任务页面增加刷新功能
 
 history:
   - version: 2024.08.8

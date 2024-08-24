@@ -20,7 +20,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import SplitPane from 'react-split-pane';
 import { useOutletContext } from '@umijs/max';
 import { SharedContext } from '@/layouts';
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ReloadOutlined } from '@ant-design/icons';
 import { depthFirstSearch } from '@/utils';
 import debounce from 'lodash/debounce';
 import uniq from 'lodash/uniq';
@@ -233,6 +233,15 @@ const Log = () => {
                   icon={<DeleteOutlined />}
                 />
               </Tooltip>,
+
+              <Tooltip title={'刷新列表'}>
+                <Button key="3" 
+                  type="primary" 
+                  onClick={() => getLogs()}
+                  icon={ <ReloadOutlined /> }
+                  >
+                </Button>
+              </Tooltip>
             ]
       }
       header={{
