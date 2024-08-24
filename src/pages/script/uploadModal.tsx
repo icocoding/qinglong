@@ -22,12 +22,10 @@ const EditScriptNameModal = ({
   currentNode,
   visible,
   onSuccess,
-  defaultType = 'upload',
 }: {
   visible: boolean;
   treeData: any[];
   currentNode?: any;
-  defaultType?: 'blank' | 'upload' | 'directory';
   handleCancel: (file?: {
     filename: string;
     path: string;
@@ -39,7 +37,7 @@ const EditScriptNameModal = ({
   const [loading, setLoading] = useState(false);
   const [dirs, setDirs] = useState<any[]>([]);
   const [file, setFile] = useState<File>();
-  const [type, setType] = useState<'blank' | 'upload' | 'directory'>(defaultType);
+  const [type, setType] = useState<'blank' | 'upload' | 'directory'>('blank');
 
   const handleOk = async (values: any) => {
     setLoading(true);
@@ -106,7 +104,7 @@ const EditScriptNameModal = ({
 
   return (
     <Modal
-      title={intl.get('创建')}
+      title={intl.get('上传文件')}
       open={visible}
       forceRender
       centered
@@ -136,8 +134,8 @@ const EditScriptNameModal = ({
           initialValue={'blank'}
         >
           <Radio.Group onChange={typeChange}>
-            <Radio value="upload">{intl.get('本地上传')}</Radio>
             <Radio value="blank">{intl.get('空文件')}</Radio>
+            <Radio value="upload">{intl.get('本地文件')}</Radio>
             <Radio value="directory">{intl.get('文件夹')}</Radio>
           </Radio.Group>
         </Form.Item>

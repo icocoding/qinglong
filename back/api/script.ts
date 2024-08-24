@@ -38,12 +38,12 @@ export default (app: Router) => {
     try {
       let result = [];
       const blacklist = [
-        'node_modules',
+        // 'node_modules',
         '.git',
         '.pnpm',
         'pnpm-lock.yaml',
         'yarn.lock',
-        'package-lock.json',
+        // 'package-lock.json',
       ];
       if (req.query.path) {
         const targetPath = path.join(
@@ -364,6 +364,66 @@ export default (app: Router) => {
         res.send({ code: 200 });
       } catch (e) {
         return next(e);
+      }
+    },
+  );
+  /**
+   * 解压文件
+   */
+  route.post(
+    '/unzip',
+    celebrate({
+      body: Joi.object({
+        filename: Joi.string().required(),
+        path: Joi.string().optional().allow(''),
+      }),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        let { filename, path } = req.body as {
+          filename: string;
+          path: string;
+        };
+        const filePath = join(config.scriptPath, path, filename);
+
+        // 执行解压文件
+        const scriptService = Container.get(ScriptService);
+        const result = await scriptService.unzipFile(filePath, filename.split('.')[0]);
+        
+        return res.send({ code: 200, result });
+      } catch (e) {
+        return next(typeof e == 'string' ? Error(e) : e);
+      }
+    },
+  );
+
+  /**
+   * 安装依赖
+   */
+  route.post(
+    '/npmInstall',
+    celebrate({
+      body: Joi.object({
+        filename: Joi.string().required(),
+        path: Joi.string().optional().allow(''),
+      }),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      try {
+        let { filename, path } = req.body as {
+          filename: string;
+          path: string;
+        };
+        const filePath = join(config.scriptPath, path, filename);
+
+        // 执行安装依赖
+        const scriptService = Container.get(ScriptService);
+        const result = await scriptService.npmInstall(filePath);
+        
+        return res.send({ code: 200, result });
+      } catch (e) {
+        return next(typeof e == 'string' ? Error(e) : e);
       }
     },
   );

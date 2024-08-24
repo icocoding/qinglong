@@ -23,7 +23,12 @@ export default () => {
   dependence(app);
   system(app);
   subscription(app);
-  action(app);
   
+  return app;
+};
+
+export const functions = () => {
+  const app = Router();
+  action(app);
   return app;
 };

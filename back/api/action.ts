@@ -16,10 +16,10 @@ export default (app: Router) => {
   app.use('/actions', route);
   // jsName 不要包含 .js
   route.get(
-    '/:jsName',
+    '/:actionName',
     celebrate({
       params: Joi.object({
-        jsName: Joi.string().required(),
+        actionName: Joi.string().required(),
       }),
     }),
     async (req: Request, res: Response, next: NextFunction) => {

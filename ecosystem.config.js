@@ -38,5 +38,15 @@ module.exports = {
       time: true,
       script: 'static/build/app.js',
     },
+    {
+      name: 'functions',
+      max_restarts: 10,
+      kill_timeout: 15000,
+      wait_ready: true,
+      listen_timeout: 10000,
+      source_map_support: true,
+      time: true,
+      script: 'static/build/functions.js',
+    },
   ],
 };

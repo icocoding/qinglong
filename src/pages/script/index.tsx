@@ -13,6 +13,7 @@ import {
   Menu,
   Empty,
   MenuProps,
+  Divider,
 } from 'antd';
 import config from '@/utils/config';
 import { PageContainer } from '@ant-design/pro-layout';
@@ -23,6 +24,7 @@ import EditModal from './editModal';
 import CodeMirror from '@uiw/react-codemirror';
 import SplitPane from 'react-split-pane';
 import {
+  BugOutlined,
   DeleteOutlined,
   DownloadOutlined,
   EditOutlined,
@@ -30,16 +32,20 @@ import {
   FileFilled,
   FolderOutlined,
   FormOutlined,
+  PlayCircleFilled,
   PlusOutlined,
   PlusSquareOutlined,
+  RedoOutlined,
   SearchOutlined,
+  UploadOutlined,
   UserOutlined,
 } from '@ant-design/icons';
 import EditScriptNameModal from './editNameModal';
+import UploadModal from './uploadModal';
 import debounce from 'lodash/debounce';
 import { history, useOutletContext, useLocation } from '@umijs/max';
 import { parse } from 'query-string';
-import { depthFirstSearch, findNode, getEditorMode } from '@/utils';
+import { depthFirstSearch, findNode, getEditorMode, getExtension } from '@/utils';
 import { SharedContext } from '@/layouts';
 import useFilterTreeData from '@/hooks/useFilterTreeData';
 import uniq from 'lodash/uniq';
@@ -49,12 +55,13 @@ import { langs } from '@uiw/codemirror-extensions-langs';
 import { useHotkeys } from 'react-hotkeys-hook';
 import prettyBytes from 'pretty-bytes';
 import Icon from '@ant-design/icons/lib/components/Icon';
+import { LANG_MAP } from '@/utils/const';
 const { Text } = Typography;
 
 const Script = () => {
   const { headerStyle, isPhone, theme } = useOutletContext<SharedContext>();
   const [value, setValue] = useState(intl.get('请选择脚本文件'));
-  const [select, setSelect] = useState<string>(intl.get('请选择脚本文件'));
+  const [select, setSelect] = useState<string>('');
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [mode, setMode] = useState('');
@@ -63,8 +70,12 @@ const Script = () => {
   const [isLogModalVisible, setIsLogModalVisible] = useState(false);
   const [searchValue, setSearchValue] = useState('');
   const [isEditing, setIsEditing] = useState(false);
+  const [isEditable, setIsEditable] = useState(false);
+  const [isUnzipFile, setIsUnzipFile] = useState(false);
+  const [isNpmProject, setIsNpmProject] = useState(false);
   const editorRef = useRef<any>(null);
   const [isAddFileModalVisible, setIsAddFileModalVisible] = useState(false);
+  const [isUploadModalVisible, setIsUploadModalVisible] = useState(false);
   const [isRenameFileModalVisible, setIsRenameFileModalVisible] =
     useState(false);
   const [currentNode, setCurrentNode] = useState<any>();
@@ -83,7 +94,7 @@ const Script = () => {
       })
       .finally(() => needLoading && setLoading(false));
   };
-
+  
   const getDetail = (node: any) => {
     request
       .get(
@@ -122,13 +133,40 @@ const Script = () => {
       return;
     }
 
+    // if (!value || node.type != 'file') {
+    //   setSelect('');
+    // } else {
+    //   setSelect(node.key);
+    // }
+
+    setIsUnzipFile(false);
+
     setSelect(node.key);
     setCurrentNode(node);
 
+    setIsNpmProject(false)
+
     if (node.type === 'directory') {
       setValue(intl.get('请选择脚本文件'));
+      const index = node.children?.findIndex((c: any) => c.type === 'file' && c.title === 'package.json');
+      setIsNpmProject(index >= 0)
       return;
     }
+
+    // if (node.type === 'file') {
+      const KEYS = Object.keys(LANG_MAP);
+      const extension = getExtension(value);
+      if (!KEYS.includes(extension)) {
+        setIsEditable(false);
+        setValue(`不支持当前文件[${extension}]预览`);
+        if (extension === '.zip') {
+          setIsUnzipFile(true)
+        }
+        return;
+      } else {
+        setIsEditable(true);
+      }
+    // }
 
     const newMode = getEditorMode(value);
     setMode(isPhone && newMode === 'typescript' ? 'javascript' : newMode);
@@ -198,18 +236,77 @@ const Script = () => {
     if (node.type === 'file') {
       setSelect(node.key);
       setCurrentNode(node);
-      setIsEditing(true);
+      editFile()
+      // setIsEditing(true);
     }
+  };
+  const unzipFile = () => {
+    // 解压文件
+    setValue(intl.get('解压文件中...') || `解压文件[${currentNode.title}]中...`);
+    setLoading(true)
+    return new Promise((resolve, reject) => {
+      request
+        .post(`${config.apiPrefix}scripts/unzip`, {
+          filename: currentNode.title,
+          path: currentNode.parent || '',
+        })
+        .then(({ code, data }) => {
+          if (code === 200) {
+            message.success(`解压文件[${currentNode.title}]成功`);
+            setValue('');
+            setTimeout(()=>{
+              getScripts(true);
+            },500)
+          }
+          resolve(null);
+        })
+        .catch((e) => {
+          setValue(`解压文件[${currentNode.title}]失败`);
+          reject(e)
+        })
+        .finally(() => setLoading(false));
+    });
+  };
+
+  const npmInstall = () => {
+    // 解压文件
+    setValue(`npm install ...`);
+    setLoading(true)
+    return new Promise((resolve, reject) => {
+      request
+        .post(`${config.apiPrefix}scripts/npmInstall`, {
+          filename: currentNode.title,
+          path: currentNode.parent || '',
+        })
+        .then(({ code, data }) => {
+          if (code === 200) {
+            message.success(`安装[${currentNode.title}]成功`);
+            setValue(`安装[${currentNode.title}]成功`);
+            setTimeout(()=>{
+              getScripts(true);
+            },500)
+          }
+          resolve(null);
+        })
+        .catch((e) => {
+          setValue(`安装[${currentNode.title}]失败`);
+          reject(e)
+        })
+        .finally(() => setLoading(false));
+    });
   };
 
   const editFile = () => {
     setTimeout(() => {
-      setIsEditing(true);
+      setIsEditing(isEditable);
     }, 300);
   };
 
   const cancelEdit = () => {
     setIsEditing(false);
+    if (!currentNode) {
+      return;
+    }
     setValue(intl.get('加载中...'));
     getDetail(currentNode);
   };
@@ -394,7 +491,7 @@ const Script = () => {
   };
 
   const initState = () => {
-    setSelect(intl.get('请选择脚本文件'));
+    setSelect('');
     setCurrentNode(null);
     setValue(intl.get('请选择脚本文件'));
   };
@@ -499,7 +596,7 @@ const Script = () => {
             label: intl.get('编辑'),
             key: 'edit',
             icon: <EditOutlined />,
-            disabled: !select,
+            disabled: currentNode?.type != 'file',
           },
           {
             label: intl.get('重命名'),
@@ -572,16 +669,56 @@ const Script = () => {
               </Button>,
             ]
           : [
+            <Tooltip title={intl.get('刷新目录')}>
+              <Button
+                type="default"
+                onClick={ () => {
+                  getScripts();
+                }
+                  }
+                  icon={<RedoOutlined />}
+              >
+              </Button>
+            </Tooltip>,
+            <Tooltip title={intl.get('解压文件') || '解压文件'}>
+              <Button
+                type="primary"
+                disabled={!isUnzipFile}
+                onClick={ () => { unzipFile(); } }
+                icon={<PlusSquareOutlined />}
+              >
+              </Button>
+            </Tooltip>,
+            <Tooltip title={intl.get('npm 安装') || 'npm 安装'}>
+              <Button
+                type="primary"
+                disabled={!isNpmProject}
+                onClick={ () => { npmInstall(); } }
+                icon={<PlayCircleFilled />}
+              >
+              </Button>
+            </Tooltip>,
+            <><Divider type='vertical' /></>,
+              // <Tooltip title={intl.get('上传文件')}>
+              //   <Button
+              //     type="default"
+              //     onClick={ () => {
+              //       uploadFile();
+              //         }
+              //       }
+              //       icon={<UploadOutlined />}
+              //   >
+              //   </Button>
+              // </Tooltip>,
               <Tooltip title={intl.get('创建')}>
                 <Button
                   type="primary"
                   onClick={addFile}
-                  icon={<PlusOutlined />}
-                />
+                  icon={<PlusOutlined />} />
               </Tooltip>,
               <Tooltip title={intl.get('编辑')}>
                 <Button
-                  disabled={!select}
+                  disabled={!isEditable}
                   type="primary"
                   onClick={editFile}
                   icon={<EditOutlined />}
@@ -589,7 +726,7 @@ const Script = () => {
               </Tooltip>,
               <Tooltip title={intl.get('重命名')}>
                 <Button
-                  disabled={!select}
+                  disabled={!currentNode}
                   type="primary"
                   onClick={renameFile}
                   icon={<IconFont type="ql-icon-rename" />}
@@ -603,14 +740,18 @@ const Script = () => {
                   icon={<DeleteOutlined />}
                 />
               </Tooltip>,
-              <Button
-                type="primary"
-                onClick={() => {
-                  setIsLogModalVisible(true);
-                }}
-              >
-                {intl.get('调试')}
-              </Button>,
+              <Tooltip title={intl.get('调试')}>
+                <Button
+                  type="primary"
+                  onClick={() => {
+                    setIsLogModalVisible(true);
+                  }}
+                  icon={
+                    <BugOutlined />
+                  }
+                >
+                </Button>
+              </Tooltip>,
             ]
       }
       header={{
@@ -666,7 +807,7 @@ const Script = () => {
               )}
             </div>
             <Editor
-              language={mode}
+              language={isEditing ? mode : ''}
               value={value}
               theme={theme}
               options={{
@@ -708,8 +849,10 @@ const Script = () => {
         <EditScriptNameModal
           visible={isAddFileModalVisible}
           treeData={data}
+          currentNode={currentNode}
           handleCancel={addFileModalClose}
           onSuccess={getScripts}
+          // defaultType={defaultType}
         />
         <RenameModal
           visible={isRenameFileModalVisible}

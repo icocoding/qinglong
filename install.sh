@@ -51,6 +51,15 @@ fi
 
 echo "架构: ${arch}"
 
+install_before() {
+    read -p "确认删除已安装qinglong Docker?[y/n]": confirm
+    if [[ x"${confirm}" == x"y" || x"${confirm}" == x"Y" ]]; then
+        echo -e "${green}开始删除...${plain}"
+        docker rm -f qinglong
+    else
+        echo -e "${red}不删除${plain}"
+    fi
+}
 install_base() {
     if [[ x"${release}" == x"centos" ]]; then
         yum install wget curl tar -y
@@ -132,7 +141,7 @@ install_qinglong() {
     latest_version=$(curl -Ls "https://api.github.com/repos/${maintainer}/qinglong/releases/latest" | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
     echo -e "${green}最新版本: ${latest_version}${plain}"
 
-    docker build --no-cache \
+    docker build --pull --no-cache \
         --build-arg QL_MAINTAINER=${maintainer} \
         --build-arg QL_BRANCH=${git_branch} \
         --build-arg LATEST_VERSION=${latest_version} \
@@ -159,5 +168,7 @@ install_qinglong() {
 
 
 echo -e "${green}开始安装${plain}"
+
+install_before
 install_base
 install_qinglong
