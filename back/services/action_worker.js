@@ -7,7 +7,9 @@ const { NodeVM } = require('vm2');
 const path = require('path');
 const { authorization, params, jsFilePath, logPath } = workerData;
 
-const MESSAGE_MAX = 500
+const MESSAGE_MAX = 500;
+const LOG_START = '=>';
+const LOG_END = '<=';
 async function appendLog(...messages) {
   const text = messages
   .map((m) => (typeof m == 'object' ? JSON.stringify(m) : m))
@@ -48,8 +50,8 @@ const vm = new NodeVM({
 const execTime = dayjs().format('YYYYMMDDHHmmss.SSS');
 async function runScript() {
   try {
-    await appendLog('==> Time:', execTime, ' <==');
-    await appendLog('==> Args:', JSON.stringify(params), ' <==');
+    await appendLog(LOG_START, 'Time:', execTime, LOG_END);
+    await appendLog(LOG_START, 'Args:', JSON.stringify(params), LOG_END);
 
     // 在沙箱中加载并运行一个脚本文件
     const runner = vm.runFile(jsFilePath);
@@ -57,13 +59,13 @@ async function runScript() {
     // 执行脚本中的函数，传递参数
     const result = await runner({ args: params, authorization });
 
-    await appendLog('==> Success: \n' + JSON.stringify(result) + ' \n<==');
+    await appendLog(LOG_START, 'Success: \n' + JSON.stringify(result) + ' \n', LOG_END);
     parentPort.postMessage(JSON.stringify(result));
   } catch (error) {
-    await appendLog('==> Error: ' + JSON.stringify(error) + ' <==');
+    await appendLog(LOG_START, 'Error: ' + JSON.stringify(error), LOG_END);
     parentPort.postMessage({ error: error.message });
   } finally {
-    await appendLog('==> End <==');
+    await appendLog(LOG_START, 'End', LOG_END);
   }
 }
 

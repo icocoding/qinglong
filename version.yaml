@@ -1,4 +1,4 @@
-version: 2024.09.1
+version: 2024.09.2
 publishTime: 2024-09-11 12:11
 changeLog: |
   1. FEAT: Action增加权限控制，Action必须绑定App
@@ -6,6 +6,8 @@ changeLog: |
   3. FEAT: Action脚本目录通过App Name进行隔离
   4. Action 详情查看 `README-actions.md`
   5. FIX: 修复脚本文件指定错误
+  6. FIX: 修复一些错误配置信息
+  
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
 
 history:

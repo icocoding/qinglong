@@ -60,6 +60,7 @@ export default {
   publicPort: parseInt(process.env.PUBLIC_PORT as string, 10),
   updatePort: parseInt(process.env.UPDATE_PORT as string, 10),
   actionsPort: parseInt(process.env.ACTIONS_PORT as string, 10),
+  tokenValidTime: parseInt((process.env.TOKEN_VALID_TIME || 24 * 60 * 60 * 1000) as string, 10),
   secret: process.env.SECRET || createRandomString(16, 32),
   logs: {
     level: process.env.LOG_LEVEL || 'silly',

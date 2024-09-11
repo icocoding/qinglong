@@ -1,7 +1,7 @@
 import { Json } from 'sequelize/types/utils';
 import { sequelize } from '.';
 import { DataTypes, Model, ModelDefined } from 'sequelize';
-
+import config from '../config';
 export class Token {
   id?: number;
   token: string;
@@ -23,7 +23,7 @@ export class Token {
         ? options.status
         : TokenStatus.available;
     this.create_time = new Date().getTime();
-    this.expire_time = options.expire_time || new Date().getTime() + 24 * 60 * 60 * 1000;
+    this.expire_time = options.expire_time || new Date().getTime() + config.tokenValidTime;
   }
 }
 

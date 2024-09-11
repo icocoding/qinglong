@@ -39,7 +39,7 @@ module.exports = {
       script: 'static/build/app.js',
     },
     {
-      name: 'functions',
+      name: 'actions',
       max_restarts: 10,
       kill_timeout: 15000,
       wait_ready: true,

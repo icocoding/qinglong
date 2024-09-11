@@ -118,8 +118,7 @@
 - 无权限控制: 注册API可选择无权限控制, 即可直接调用
 - 有权限控制: 
     - 控制角色: Admin/User
-- AppToken:
-    - AppKey和AppSecret生成的Token
-    - 有效期24h
-
+- Token:
+    - 默认有效期24h
+    - 可通过环境变量(`.env`文件)`TOKEN_VALID_TIME`或者运行参数`process.env.TOKEN_VALID_TIME`修改
 ##

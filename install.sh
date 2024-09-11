@@ -52,7 +52,7 @@ fi
 echo "架构: ${arch}"
 
 install_before() {
-    read -p "确认删除已安装qinglong Docker?[y/n]": confirm
+    read -p "确认删除已安装qinglong Docker container?[y/n]": confirm
     if [[ x"${confirm}" == x"y" || x"${confirm}" == x"Y" ]]; then
         echo -e "${green}开始删除...${plain}"
         docker rm -f qinglong
@@ -106,6 +106,7 @@ install_base() {
     export maintainer=$maintainer
     export git_branch=$git_branch
     export panel_port=$panel_port
+    export api_port=$api_port
     export data_path=$data_path
     export secret=$secret
 }
@@ -160,7 +161,7 @@ install_qinglong() {
         --name qinglong \
         --hostname qinglong \
         -p ${panel_port}:5700 \
-        -p ${api_port}:5800 \
+        -p ${api_port}:5710 \
         -e SECRET=${secret} \
         -v ${data_path}:/ql/data \
         --restart always ${maintainer}/qinglong
