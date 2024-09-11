@@ -120,9 +120,6 @@
     - 控制角色: Admin/User
 - AppToken:
     - AppKey和AppSecret生成的Token
-    - 有效期30天
-    - 应用于服务端调用
-
-
+    - 有效期24h
 
 ##

@@ -46,7 +46,7 @@ module.exports = {
       listen_timeout: 10000,
       source_map_support: true,
       time: true,
-      script: 'static/build/functions.js',
+      script: 'static/build/actions.js',
     },
   ],
 };
