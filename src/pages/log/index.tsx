@@ -89,7 +89,7 @@ const Log = () => {
   }, []);
 
   const onSearch = useCallback(
-    (e) => {
+    (e: any) => {
       const keyword = e.target.value;
       debounceSearch(keyword);
     },
@@ -296,6 +296,7 @@ const Log = () => {
               language="shell"
               theme={theme}
               value={value}
+              width={'100%'}
               options={{
                 readOnly: true,
                 fontSize: 12,

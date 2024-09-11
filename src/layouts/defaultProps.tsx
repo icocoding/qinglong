@@ -1,5 +1,5 @@
-import intl from 'react-intl-universal';
-import { SettingOutlined } from '@ant-design/icons';
+import intl from '@/utils/intl';
+import { LineChartOutlined, LockOutlined, PlayCircleOutlined, SettingOutlined, UserOutlined } from '@ant-design/icons';
 import IconFont from '@/components/iconfont';
 import { BasicLayoutProps } from '@ant-design/pro-layout';
 
@@ -53,6 +53,18 @@ export default {
         name: intl.get('脚本管理'),
         icon: <IconFont type="ql-icon-script" />,
         component: '@/pages/script/index',
+      },
+      {
+        path: '/action',
+        name: intl.get('调用管理'),
+        icon: <PlayCircleOutlined />,
+        component: '@/pages/action/index',
+      },
+      {
+        path: '/user',
+        name: intl.get('用户管理'),
+        icon: <UserOutlined />,
+        component: '@/pages/user/index',
       },
       {
         path: '/dependence',

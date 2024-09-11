@@ -59,7 +59,7 @@ export default {
   cronPort: parseInt(process.env.CRON_PORT as string, 10),
   publicPort: parseInt(process.env.PUBLIC_PORT as string, 10),
   updatePort: parseInt(process.env.UPDATE_PORT as string, 10),
-  functionsPort: parseInt(process.env.FUNCTIONS_PORT as string, 10),
+  actionsPort: parseInt(process.env.ACTIONS_PORT as string, 10),
   secret: process.env.SECRET || createRandomString(16, 32),
   logs: {
     level: process.env.LOG_LEVEL || 'silly',

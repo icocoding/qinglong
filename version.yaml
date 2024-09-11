@@ -1,18 +1,24 @@
-version: 2024.08.10
-changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
-publishTime: 2024-08-24 15:40
+version: 2024.09.0
+publishTime: 2024-09-11 12:11
 changeLog: |
-  1. FEAT: 脚本管理页面增加`刷新目录`功能
-  2. FEAT: 脚本管理页面增加`解压压缩包`功能
-  3. FEAT: 脚本管理页面增加`npm 安装依赖`功能
-  4. FIX: 创建脚本默认代入当前选中的目录
-  5. FIX: 查看脚本时, 脚本内容为黑色, 不启用代码风格
-  6. FIX: 调整脚本管理页面的编辑、重命名、删除等图标禁用逻辑
-  7. FIX: 日志管理页面、定时任务页面增加刷新功能
+  1. FEAT: Action增加权限控制，Action必须绑定App
+  2. FEAT: 增加用户管理、用户权限管理，用户必须绑定App
+  3. FEAT: Action脚本目录通过App Name进行隔离
+  4. Action 详情查看 `README-actions.md`
+changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
 
 history:
+  - version: 2024.08.10
+    publishTime: 2024-08-24 15:40
+    changeLog: |
+      1. FEAT: 脚本管理页面增加`刷新目录`功能
+      2. FEAT: 脚本管理页面增加`解压压缩包`功能
+      3. FEAT: 脚本管理页面增加`npm 安装依赖`功能
+      4. FIX: 创建脚本默认代入当前选中的目录
+      5. FIX: 查看脚本时, 脚本内容为黑色, 不启用代码风格
+      6. FIX: 调整脚本管理页面的编辑、重命名、删除等图标禁用逻辑
+      7. FIX: 日志管理页面、定时任务页面增加刷新功能
   - version: 2024.08.8
-    changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
     publishTime: 2024-08-20 13:40
     changeLog: |
       1. FEAT：接口调用，/api/actions/:actionName
@@ -30,7 +36,6 @@ history:
         - 采用VM2执行接口js脚本
       2. FIX: 定时任务规则不生效问题
   - version: 2024.05.0
-    changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
     publishTime: 2024-05-17 21:40
     changeLog: |
       1. FEAT：脚本保存备份，防止异常时丢失脚本😭

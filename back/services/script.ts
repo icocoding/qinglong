@@ -97,7 +97,7 @@ export default class ScriptService {
     })
   }
   public async npmInstall(filePath: string) {
-    const command = `npm install --prefix ${filePath}`;
+    const command = `npm install --production --prefix ${filePath}`;
     const that = this;
     return new Promise(async function(resolve, reject) {
       await that.scheduleService.runTask(

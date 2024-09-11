@@ -6,4 +6,9 @@ export const LANG_MAP = {
   '.mjs': 'javascript',
   '.sh': 'shell',
   '.ts': 'typescript',
+  '.txt': 'text',
+  '.json': 'json',
+  '.md': 'markdown',
+  '.css': 'css',
+  '.html': 'html',
 };

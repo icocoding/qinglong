@@ -18,9 +18,9 @@ RUN set -x \
 RUN set -x \
   && apk update \
   && apk add nodejs npm git \
-  && npm i -g pnpm@8.3.1 pm2 tsx \
+  && npm i -g pnpm@8.3.1 pm2 tsx --registry=https://registry.npmmirror.com/ \
   && cd ${BUILD_DIR} \
-  && pnpm install --prod
+  && pnpm install --prod --registry=https://registry.npmmirror.com/
 
 
 # 2

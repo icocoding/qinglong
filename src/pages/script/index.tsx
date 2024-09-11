@@ -54,7 +54,6 @@ import RenameModal from './renameModal';
 import { langs } from '@uiw/codemirror-extensions-langs';
 import { useHotkeys } from 'react-hotkeys-hook';
 import prettyBytes from 'pretty-bytes';
-import Icon from '@ant-design/icons/lib/components/Icon';
 import { LANG_MAP } from '@/utils/const';
 const { Text } = Typography;
 
@@ -81,6 +80,7 @@ const Script = () => {
   const [currentNode, setCurrentNode] = useState<any>();
   const [expandedKeys, setExpandedKeys] = useState<string[]>([]);
 
+  const FILE_EXTENSIONS = Object.keys(Object.assign({}, LANG_MAP));
   const getScripts = (needLoading: boolean = true) => {
     needLoading && setLoading(true);
     request
@@ -154,9 +154,8 @@ const Script = () => {
     }
 
     // if (node.type === 'file') {
-      const KEYS = Object.keys(LANG_MAP);
       const extension = getExtension(value);
-      if (!KEYS.includes(extension)) {
+      if (!FILE_EXTENSIONS.includes(extension)) {
         setIsEditable(false);
         setValue(`不支持当前文件[${extension}]预览`);
         if (extension === '.zip') {

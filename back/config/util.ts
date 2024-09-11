@@ -51,6 +51,14 @@ export function getToken(req: any) {
   }
   return '';
 }
+export function getBasicToken(req: any) {
+  const { authorization = '' } = req.headers;
+  if (authorization && authorization.split(' ')[0] === 'Basic') {
+    return (authorization as string)
+      .replace('Basic ', '');
+  }
+  return '';
+}
 
 export async function getNetIp(req: any) {
   const ipArray = [

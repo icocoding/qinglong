@@ -9,6 +9,9 @@ import { SystemModel } from '../data/system';
 import { fileExist } from '../config/util';
 import { SubscriptionModel } from '../data/subscription';
 import { CrontabViewModel } from '../data/cronView';
+import { ActionModel } from '../data/action';
+import { TokenModel } from '../data/token';
+import { UserModel } from '../data/user';
 import config from '../config';
 import { sequelize } from '../data';
 
@@ -21,6 +24,10 @@ export default async () => {
     await EnvModel.sync();
     await SubscriptionModel.sync();
     await CrontabViewModel.sync();
+
+    await ActionModel.sync();
+    await TokenModel.sync();
+    await UserModel.sync();
 
     // 初始化新增字段
     try {
@@ -58,6 +65,12 @@ export default async () => {
     try {
       await sequelize.query('alter table Crontabs add column task_after TEXT');
     } catch (error) { }
+
+    try {
+      await sequelize.query(
+        'alter table Actions add column status NUMBER',
+      );
+    } catch (error) {}
 
     // 2.10-2.11 升级
     const cronDbFile = path.join(config.rootPath, 'db/crontab.db');

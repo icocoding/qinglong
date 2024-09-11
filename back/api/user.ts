@@ -8,7 +8,6 @@ import path from 'path';
 import { v4 as uuidV4 } from 'uuid';
 import rateLimit from 'express-rate-limit';
 import config from '../config';
-const route = Router();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -23,6 +22,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 export default (app: Router) => {
+  const route = Router();
   app.use('/user', route);
 
   route.post(
@@ -264,3 +264,125 @@ export default (app: Router) => {
     },
   );
 };
+
+
+/**
+ * 管理接口
+ */
+export const userMana = (app: Router) => {
+  const route = Router();
+  app.use('/users', route);
+  route.get('/', async (req: Request, res: Response, next: NextFunction) => {
+    const logger: Logger = Container.get('logger');
+    try {
+      const userService = Container.get(UserService);
+      const data = await userService.getUsers(req.query.searchValue as string);
+      return res.send({ code: 200, data });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+});
+  route.post(
+    '/',
+    celebrate({
+      body: Joi.array().items(
+        Joi.object({
+          roles: Joi.array(),
+          username: Joi.string()
+            .required()
+            .pattern(/^[a-zA-Z_][0-9a-zA-Z_\-]*$/),
+          password: Joi.string().required(),
+          remarks: Joi.string().optional().allow(''),
+          app_name: Joi.string().required(),
+        }),
+      ),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const service = Container.get(UserService);
+        const data = await service.create(req.body);
+        return res.send({ code: 200, data });
+      } catch (e) {
+        return next(e);
+      }
+    },
+  );
+  route.put(
+    '/',
+    celebrate({
+      body: Joi.object({
+        roles: Joi.array(),
+        remarks: Joi.string().optional().allow('').allow(null),
+        id: Joi.number().required(),
+        app_name: Joi.string().required(),
+      }),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const {
+          roles, remarks, id, app_name
+        } = req.body;
+        const service = Container.get(UserService);
+        const data = await service.updateUser(id, {roles, remarks, app_name} as any);
+        return res.send({ code: 200, data });
+      } catch (e) {
+        return next(e);
+      }
+    },
+  );
+
+  route.delete(
+    '/',
+    celebrate({
+      body: Joi.array().items(Joi.number().required()),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const service = Container.get(UserService);
+        const data = await service.remove(req.body);
+        return res.send({ code: 200, data });
+      } catch (e) {
+        return next(e);
+      }
+    },
+  );
+  route.put(
+    '/disable',
+    celebrate({
+      body: Joi.array().items(Joi.number().required()),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const service = Container.get(UserService);
+        const data = await service.disabled(req.body);
+        return res.send({ code: 200, data });
+      } catch (e) {
+        return next(e);
+      }
+    },
+  );
+
+  route.put(
+    '/enable',
+    celebrate({
+      body: Joi.array().items(Joi.number().required()),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const service = Container.get(UserService);
+        const data = await service.enabled(req.body);
+        return res.send({ code: 200, data });
+      } catch (e) {
+        return next(e);
+      }
+    },
+  );
+
+};
+

@@ -9,7 +9,8 @@ import open from './open';
 import dependence from './dependence';
 import system from './system';
 import subscription from './subscription';
-import action from './action';
+import action, { openApis as openActionsApi } from './action';
+import { userMana } from './user';
 
 export default () => {
   const app = Router();
@@ -23,12 +24,20 @@ export default () => {
   dependence(app);
   system(app);
   subscription(app);
-  
+  // 后台管理接口
+  action(app);
+  userMana(app);
   return app;
 };
 
-export const functions = () => {
+export const actions = () => {
   const app = Router();
   action(app);
+  return app;
+};
+
+export const openApiActions = () => {
+  const app = Router();
+  openActionsApi(app);
   return app;
 };

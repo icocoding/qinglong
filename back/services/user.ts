@@ -27,9 +27,12 @@ import dayjs from 'dayjs';
 import IP2Region from 'ip2region';
 import requestIp from 'request-ip';
 import uniq from 'lodash/uniq';
+import { UserInstance, User, UserModel, UserStatus } from '../data/user';
+import { Op } from 'sequelize';
 
 @Service()
 export default class UserService {
+
   @Inject((type) => NotificationService)
   private notificationService!: NotificationService;
 
@@ -119,7 +122,7 @@ export default class UserService {
       if (username === cUsername && password === cPassword) {
         const data = createRandomString(50, 100);
         const expiration = twoFactorActivated ? 60 : 20;
-        let token = jwt.sign({ data, platform: 'icocoding' }, config.secret as any, {
+        let token = jwt.sign({ data }, config.secret as any, {
           expiresIn: 60 * 60 * 24 * expiration,
           algorithm: 'HS384',
         });
@@ -390,4 +393,100 @@ export default class UserService {
       return { code: 400, message: '通知发送失败，请检查参数' };
     }
   }
+
+  public async getUserByName(name: string): Promise<User> {
+    const doc: any = await UserModel.findOne({ where: { username: name } });
+    return doc && (doc.get({ plain: true }) as any);
+  }
+
+  // 用户管理接口
+
+  public async getUsers(searchText: string = '', query: any = {}): Promise<User[]>{
+    let condition = { ...query };
+    if (searchText) {
+      const encodeText = encodeURI(searchText);
+      const reg = {
+        [Op.or]: [
+          { [Op.like]: `%${searchText}%` },
+          { [Op.like]: `%${encodeText}%` },
+        ],
+      };
+
+      condition = {
+        ...condition,
+        [Op.or]: [
+          {
+            name: reg,
+          },
+        ],
+      };
+    }
+    try {
+      const result = await this.find(condition, [
+        ['create_time', 'ASC'],
+      ]);
+      return result as any;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+
+  private async find(query: any, sort: any = []): Promise<User[]> {
+    const docs = await UserModel.findAll({
+      where: { ...query },
+      order: [...sort],
+    });
+    return docs;
+  }
+
+
+  public async create(payloads: User[]): Promise<User[]> {
+    const docs = await this.insert(payloads.map(u => new User(u)));
+    return docs;
+  }
+
+  public async insert(payloads: User[]): Promise<User[]> {
+    const result = [];
+    for (const user of payloads) {
+      const doc = await UserModel.create(user, { returning: true });
+      result.push(doc);
+    }
+    return result;
+  }
+
+  public async update(payload: User): Promise<User> {
+    const doc = await this.getDb({ id: payload.id });
+    const tab = new User({ ...doc, ...payload });
+    const newDoc = await this.updateDb(tab);
+    return newDoc;
+  }
+
+  public async updateUser(id: number, payload: any): Promise<User> {
+    await UserModel.update({ ...payload }, { where: { id } });
+    return await this.getDb({ id: id });
+  }
+
+  private async updateDb(payload: User): Promise<User> {
+    await UserModel.update({ ...payload }, { where: { id: payload.id } });
+    return await this.getDb({ id: payload.id });
+  }
+
+
+  public async remove(ids: string[]) {
+    await UserModel.destroy({ where: { id: ids } });
+  }
+
+
+  public async disabled(ids: string[]) {
+    await UserModel.update(
+      { status: UserStatus.disabled },
+      { where: { id: ids } },
+    );
+  }
+
+  public async enabled(ids: string[]) {
+    await UserModel.update({ status: UserStatus.normal }, { where: { id: ids } });
+  }
+
 }

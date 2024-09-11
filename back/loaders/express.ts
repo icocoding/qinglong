@@ -11,7 +11,6 @@ import OpenService from '../services/open';
 import rewrite from 'express-urlrewrite';
 import UserService from '../services/user';
 import * as Sentry from '@sentry/node';
-import { EnvModel } from '../data/env';
 import { errors } from 'celebrate';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { serveEnv } from '../config/serverEnv';
@@ -127,11 +126,11 @@ export default ({ app }: { app: Application }) => {
   app.use(rewrite('/open/*', '/api/$1'));
   app.use(config.api.prefix, routes());
 
-  app.use((req, res, next) => {
-    const err: any = new Error('Not Found');
-    err['status'] = 404;
-    next(err);
-  });
+  // app.use((req, res, next) => {
+  //   const err: any = new Error('Not Found');
+  //   err['status'] = 404;
+  //   next(err);
+  // });
 
   app.use(errors());
 

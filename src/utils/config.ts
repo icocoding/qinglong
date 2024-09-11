@@ -1,4 +1,4 @@
-import intl from 'react-intl-universal';
+import intl from './intl';
 const baseUrl = window.__ENV__QlBaseUrl || '/';
 
 export default {
@@ -60,6 +60,10 @@ export default {
       value: 'scripts',
     },
     {
+      name: intl.get('API调用'),
+      value: 'actions',
+    },
+    {
       name: intl.get('日志管理'),
       value: 'logs',
     },
@@ -78,6 +82,7 @@ export default {
     subscriptions: intl.get('订阅管理'),
     configs: intl.get('配置文件'),
     scripts: intl.get('脚本管理'),
+    actions: intl.get('API调用'),
     logs: intl.get('日志管理'),
     dependencies: intl.get('依赖管理'),
     system: intl.get('系统信息'),
@@ -415,6 +420,8 @@ export default {
     '/subscription': intl.get('订阅管理'),
     '/config': intl.get('配置文件'),
     '/script': intl.get('脚本管理'),
+    '/action': intl.get('接口管理'),
+    '/user': intl.get('用户管理'),
     '/diff': intl.get('对比工具'),
     '/log': intl.get('日志管理'),
     '/setting': intl.get('系统设置'),
@@ -422,4 +429,8 @@ export default {
     '/dependence': intl.get('依赖管理'),
   },
   dependenceTypes: ['nodejs', 'python3', 'linux'],
+  roleMap : {
+    'Admin': '管理员',
+    'User': '用户',
+  }
 };

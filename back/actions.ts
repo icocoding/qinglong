@@ -9,12 +9,12 @@ async function startServer() {
   const app = express();
   depInjectorLoader();
 
-  await require('./loaders/functions').default({ app });
+  await require('./loaders/actions').default({ app });
 
   app
-    .listen(config.functionsPort, () => {
-      Logger.debug(`✌️ FUNCTIONS 服务启动成功！`);
-      console.debug(`✌️ FUNCTIONS 服务启动成功！ port: ${config.functionsPort}`);
+    .listen(config.actionsPort, () => {
+      Logger.debug(`✌️ actions 服务启动成功！`);
+      console.debug(`✌️ actions 服务启动成功！ port: ${config.actionsPort}`);
       process.send?.('ready');
     })
     .on('error', (err) => {

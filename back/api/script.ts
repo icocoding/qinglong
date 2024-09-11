@@ -12,7 +12,8 @@ import { Logger } from 'winston';
 import config from '../config';
 import * as fs from 'fs/promises';
 import { celebrate, Joi } from 'celebrate';
-import path, { join, parse } from 'path';
+import * as Path from 'path';
+import { join, parse } from 'path';
 import ScriptService from '../services/script';
 import multer from 'multer';
 
@@ -46,7 +47,7 @@ export default (app: Router) => {
         // 'package-lock.json',
       ];
       if (req.query.path) {
-        const targetPath = path.join(
+        const targetPath = Path.join(
           config.scriptPath,
           req.query.path as string,
         );
@@ -157,10 +158,14 @@ export default (app: Router) => {
         );
         const filePath = join(path, `${filename.replace(/\//g, '')}`);
         const fileExists = await fileExist(filePath);
+        const copyFilePath = join(config.bakPath, originFilename.replace(/\//g, ''));
+        if (!await fileExist(Path.dirname(copyFilePath))) {
+          await fs.mkdir(Path.dirname(copyFilePath));
+        }
         if (fileExists) {
           await fs.copyFile(
             originFilePath,
-            join(config.bakPath, originFilename.replace(/\//g, '')),
+            copyFilePath,
           );
           if (filename !== originFilename) {
             await rmPath(originFilePath);
@@ -199,13 +204,15 @@ export default (app: Router) => {
 
         // 备份脚本
         const { name, ext } = parse(filename);
-        const prefix = path == '/' ? '' : path.replace('/', '-');
+        const prefix = path == '/' ? '' : path;
+        // path.replace('/', '-')
         const bakDir = join(config.logPath,`${prefix}${name}.bak`);
         const execTime = dayjs().format('YYYY-MM-DD-HH-mm-ss-SSS');
         const bakPath = `${bakDir}/${execTime}${ext}`;
         const fileExists = await fileExist(bakDir);
+        console.log('backup path:', bakPath);
         if (!fileExists) {
-          await fs.mkdir(bakDir);
+          await fs.mkdir(bakDir, { recursive: true },);
         }
         await fs.writeFile(bakPath, content);
         
