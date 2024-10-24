@@ -20,7 +20,7 @@ import OpenService from '../services/open';
 import Container from 'typedi';
 import ActionService from '../services/action';
 import TokenService from '../services/token';
-import { TokenStatus } from 'back/data/token';
+import { TokenStatus } from '../data/token';
 
 export default ({ app }: { app: Application }) => {
   app.set('trust proxy', 'loopback');
