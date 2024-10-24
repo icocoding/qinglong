@@ -75,7 +75,10 @@ export default ({ app }: { app: Application }) => {
       if (tokenModel && tokenModel.id) {
         await tokenService.expire([tokenModel.id]);
       }
-      return next();
+      return res
+      .status(200)
+      .send({ code: 0, msg: 'Logout success' })
+      .end();
     }
 
     const names = actionName.split('/');
