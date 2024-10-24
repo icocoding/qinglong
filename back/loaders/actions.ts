@@ -30,7 +30,7 @@ export default ({ app }: { app: Application }) => {
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
   const ACTION_PREFIX = '/actions/';
-  
+
   // 兼容之前的api
   app.use(rewrite('/api/*', '/$1'));
 
@@ -44,7 +44,6 @@ export default ({ app }: { app: Application }) => {
   // );
   // 获取平台信息
   app.use((req: any, res, next) => {
-
     if (!req.path.startsWith(ACTION_PREFIX)) {
       throw Error('Request Path Error');
     }
@@ -60,7 +59,6 @@ export default ({ app }: { app: Application }) => {
   });
 
   app.use(async (req: any, res, next) => {
-
     const actionName = req.path.replace(ACTION_PREFIX, '');
 
     if (actionName.endsWith('/auth/token')) {
@@ -69,11 +67,27 @@ export default ({ app }: { app: Application }) => {
 
     const headerToken = getToken(req);
     console.log('headerToken', headerToken, 'actionName', actionName);
+
+    // 失效 Token
+    if (actionName.endsWith('/auth/logout')) {
+      const tokenService = Container.get(TokenService);
+      const tokenModel = await tokenService.getToken(headerToken);
+      if (tokenModel && tokenModel.id) {
+        await tokenService.expire([tokenModel.id]);
+      }
+      return next();
+    }
+
     const names = actionName.split('/');
     const actionService = Container.get(ActionService);
-    const action = await actionService.getDb({app_name: names[0], name: names[1]});
+    const action = await actionService.getDb({
+      app_name: names[0],
+      name: names[1],
+    });
     if (!action) {
-      const err = new UnauthorizedError('error_action', { message: 'Action was not allowed' });
+      const err = new UnauthorizedError('error_action', {
+        message: 'Action was not allowed',
+      });
       return next(err);
     }
     // 不校验权限
@@ -81,7 +95,9 @@ export default ({ app }: { app: Application }) => {
       return next();
     }
     if (!headerToken) {
-      const err = new UnauthorizedError('need_permission', { message: 'No authorization token was found' });
+      const err = new UnauthorizedError('need_permission', {
+        message: 'No authorization token was found',
+      });
       return next(err);
     }
 
@@ -91,37 +107,46 @@ export default ({ app }: { app: Application }) => {
 
     const tokenService = Container.get(TokenService);
     const tokenModel = await tokenService.getToken(headerToken);
-    if (!tokenModel || tokenModel.status == TokenStatus.unavailable || tokenModel.expire_time < Date.now()) {
-      const err = new UnauthorizedError('expiration_permission', { message: 'Authorization token was expired' });
+    if (
+      !tokenModel ||
+      tokenModel.status == TokenStatus.unavailable ||
+      tokenModel.expire_time < Date.now()
+    ) {
+      const err = new UnauthorizedError('expiration_permission', {
+        message: 'Authorization token was expired',
+      });
       return next(err);
     } else {
-
-      // 失效 Token
-    if (actionName.endsWith('/auth/logout')) {
-      await tokenService.expire([tokenModel.token]);
-      return next();
-    }
-
       // 判断角色权限
       const actionRoles = action.roles;
       const tokenRoles = tokenModel.payload.roles;
-      if (!actionRoles || actionRoles.length === 0 || !tokenRoles || tokenRoles.length === 0) {
-        const err = new UnauthorizedError('role_permission', { message: 'Permission not set' });
+      if (
+        !actionRoles ||
+        actionRoles.length === 0 ||
+        !tokenRoles ||
+        tokenRoles.length === 0
+      ) {
+        const err = new UnauthorizedError('role_permission', {
+          message: 'Permission not set',
+        });
         return next(err);
       }
-      const isAllow = actionRoles.some( r => tokenRoles.includes(r) );
+      const isAllow = actionRoles.some((r) => tokenRoles.includes(r));
       if (!isAllow) {
-        const err = new UnauthorizedError('permission_denied', { message: 'Permission denied' });
+        const err = new UnauthorizedError('permission_denied', {
+          message: 'Permission denied',
+        });
         return next(err);
       }
       if (names[0] != tokenModel.payload.app_name) {
-        const err = new UnauthorizedError('permission_denied', { message: 'AppName error' });
+        const err = new UnauthorizedError('permission_denied', {
+          message: 'AppName error',
+        });
         return next(err);
       }
       req.authorization = tokenModel.payload;
       return next();
     }
-
   });
 
   app.use('', openApiActions());
@@ -131,7 +156,6 @@ export default ({ app }: { app: Application }) => {
     err['status'] = 404;
     next(err);
   });
-
 
   app.use(errors());
 

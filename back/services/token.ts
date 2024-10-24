@@ -26,7 +26,7 @@ export default class TokenService {
     return result;
   }
 
-  public async expire(ids: string[]) {
+  public async expire(ids: number[]) {
     await TokenModel.update(
       { status: TokenStatus.unavailable },
       { where: { id: ids } },
