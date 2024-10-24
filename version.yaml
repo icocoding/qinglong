@@ -1,19 +1,24 @@
-version: 2024.09.3
-publishTime: 2024-09-11 12:11
+version: 2024.10.1
+publishTime: 2024-10-24 17:32
 changeLog: |
-  1. FEAT: Action增加权限控制，Action必须绑定App
-  2. FEAT: 增加用户管理、用户权限管理，用户必须绑定App
-  3. FEAT: Action脚本目录通过App Name进行隔离
-  4. Action 详情查看 `README-actions.md`
-  5. FIX: 修复脚本文件指定错误
-  6. FIX: 修复一些错误配置信息
-  7. FIX: `npm warn config production Use `--omit=dev` instead.` 
-    > 这个命令告诉 npm 只安装 dependencies，忽略 devDependencies。然而，
-    从 npm v7 开始，--production 已经被弃用，官方推荐使用 --omit=dev 来代替。
+  1. FEAT: 失效Token
   
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
 
 history:
+  - version: 2024.09.3
+    publishTime: 2024-09-11 12:11
+    changeLog: |
+      1. FEAT: Action增加权限控制，Action必须绑定App
+      2. FEAT: 增加用户管理、用户权限管理，用户必须绑定App
+      3. FEAT: Action脚本目录通过App Name进行隔离
+      4. Action 详情查看 `README-actions.md`
+      5. FIX: 修复脚本文件指定错误
+      6. FIX: 修复一些错误配置信息
+      7. FIX: `npm warn config production Use `--omit=dev` instead.` 
+        > 这个命令告诉 npm 只安装 dependencies，忽略 devDependencies。然而，
+        从 npm v7 开始，--production 已经被弃用，官方推荐使用 --omit=dev 来代替。
+      
   - version: 2024.08.10
     publishTime: 2024-08-24 15:40
     changeLog: |

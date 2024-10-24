@@ -83,6 +83,11 @@
                 return checkUser(params.args)
             }
             ```
++ 失效Token
+    - POST /actions/:appName/auth/logout
+    - 无参数
+    - 返回: 
+
 + 自定义函数调
     - POST /actions/:appName/:actionName
     - appName: 是Action所属的应用名称

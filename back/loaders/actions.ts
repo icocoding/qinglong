@@ -20,6 +20,7 @@ import OpenService from '../services/open';
 import Container from 'typedi';
 import ActionService from '../services/action';
 import TokenService from '../services/token';
+import { TokenStatus } from 'back/data/token';
 
 export default ({ app }: { app: Application }) => {
   app.set('trust proxy', 'loopback');
@@ -83,16 +84,23 @@ export default ({ app }: { app: Application }) => {
       const err = new UnauthorizedError('need_permission', { message: 'No authorization token was found' });
       return next(err);
     }
+
     // 校验 Token
     // const redisKey = `token:${headerToken}`
     // const redisData = await getRedisData(redisKey);
 
     const tokenService = Container.get(TokenService);
     const tokenModel = await tokenService.getToken(headerToken);
-    if (!tokenModel || tokenModel.expire_time < Date.now()) {
+    if (!tokenModel || tokenModel.status == TokenStatus.unavailable || tokenModel.expire_time < Date.now()) {
       const err = new UnauthorizedError('expiration_permission', { message: 'Authorization token was expired' });
       return next(err);
     } else {
+
+      // 失效 Token
+    if (actionName.endsWith('/auth/logout')) {
+      await tokenService.expire([tokenModel.token]);
+      return next();
+    }
 
       // 判断角色权限
       const actionRoles = action.roles;

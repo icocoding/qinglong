@@ -50,6 +50,7 @@ const vm = new NodeVM({
 const execTime = dayjs().format('YYYYMMDDHHmmss.SSS');
 async function runScript() {
   try {
+    await appendLog(LOG_START, 'Node.js versions:', process.versions, LOG_END);
     await appendLog(LOG_START, 'Time:', execTime, LOG_END);
     await appendLog(LOG_START, 'Args:', JSON.stringify(params), LOG_END);
 
@@ -63,7 +64,8 @@ async function runScript() {
     parentPort.postMessage(JSON.stringify(result));
   } catch (error) {
     await appendLog(LOG_START, 'Error: ' + JSON.stringify(error), LOG_END);
-    parentPort.postMessage({ error: error.message });
+    console.log(error.message)
+    parentPort.postMessage(JSON.stringify(error));
   } finally {
     await appendLog(LOG_START, 'End', LOG_END);
   }
