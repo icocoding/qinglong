@@ -3,10 +3,10 @@ name: Build And Push Docker Image
 on:
   push:
     paths-ignore:
-      - "*.md"
+      - '*.md'
     branches:
-      - "master"
-      - "develop"
+      - 'master'
+      - 'develop'
   workflow_dispatch:
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v3
         with:
-          version: "8.3.1"
+          version: '8.3.1'
 
       - name: Install dependencies
         run: pnpm install
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '21'
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: build front and back
         id: build_front_and_back
@@ -52,13 +52,14 @@ jobs:
           echo "::set-output name=CHANGE_LOG::${changeLog}"
           tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}')
           echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
+        continue-on-error: true
 
       - name: Zip the file
         id: zip_static
         run: |
           STATIC_PATH=${{ steps.build_front_and_back.outputs.STATIC_PATH }}
           zip -r qinglong_static.zip static/*
-          
+
           echo "::set-output name=ZIP_FILE_PATH::$(pwd)/qinglong_static.zip"
       - name: Create Release
         id: create_release
@@ -86,4 +87,3 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           release_id: ${{ steps.create_release.outputs.id }}
-    
