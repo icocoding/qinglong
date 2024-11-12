@@ -50,7 +50,7 @@ jobs:
           echo "$changeLog" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
           echo "::set-output name=CHANGE_LOG::${changeLog}"
-          tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}')
+          tag_name=$(cat version.yaml | grep 'version:' | awk '{print $2}' | grep -v '^$' | head -n 1)
           echo "::set-output name=PUBLISH_TAG_NAME::${tag_name}"
         continue-on-error: true
 
