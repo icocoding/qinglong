@@ -50,10 +50,6 @@ export const openApis = (app: Router) => {
         appName: Joi.string().required(),
         actionName: Joi.string().required(),
       }),
-      body: Joi.object({
-        username: Joi.string().required(),
-        password: Joi.string().required(),
-      }),
     }),
     async (req: Request, res: Response, next: NextFunction) => {
       const logger: Logger = Container.get('logger');

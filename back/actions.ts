@@ -11,7 +11,7 @@ async function startServer() {
 
   await require('./loaders/actions').default({ app });
 
-  Logger.debug(`✌️ actions 服务启动...`);
+  console.debug(`✌️ actions 服务启动...`);
   app
     .listen(config.actionsPort, () => {
       Logger.debug(`✌️ actions 服务启动成功！`);

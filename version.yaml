@@ -1,4 +1,4 @@
-version: 2024.11.6
+version: 2024.11.7
 publishTime: 2024-11-23 16:01
 changeLog: |
   1. Auth增加其他方法, 返回 `code = 999999`, 表示可以获取token, 其他返回类似普通Action
