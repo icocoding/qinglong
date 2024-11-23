@@ -45,21 +45,23 @@ export default ({ app }: { app: Application }) => {
   //   }),
   // );
 
-  const jwtMiddleware: any = jwt({
+  const jwtMiddleware: jwt.RequestHandler & { aunless?: typeof unless } = jwt({
     secret: config.secret,
     algorithms: ['HS384'],
-  }) as jwt.RequestHandler & { unless: typeof unless };
+  });
 
-  jwtMiddleware.unless = unless;
+  jwtMiddleware.aunless = unless;
 
-  app.use(
-    jwtMiddleware.unless({
-      path: [
-        ...config.apiWhiteList,
-        /^\/open\//,
-      ],
-    }),
-  );
+  if (jwtMiddleware.aunless) {
+    app.use(
+      jwtMiddleware.aunless.unless({
+        path: [
+          ...config.apiWhiteList,
+          /^\/open\//,
+        ],
+      })
+    );
+  }
 
   app.use((req: Request, res, next) => {
     console.log('Request Path:', req.path);
