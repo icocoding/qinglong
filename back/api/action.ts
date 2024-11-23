@@ -40,11 +40,94 @@ export const openApis = (app: Router) => {
   app.use('/actions', route);
 
   route.post(
-    '/:appName/auth/:actionName',
+    '/:appName/auth/token',
     rateLimit({
       windowMs: 1 * 60 * 1000,
       max: 5,
     }),
+    celebrate({
+      params: Joi.object({
+        appName: Joi.string().required(),
+        actionName: Joi.string().required(),
+      }),
+      body: Joi.object({
+        username: Joi.string().required(),
+        password: Joi.string().required(),
+      }),
+    }),
+    async (req: Request, res: Response, next: NextFunction) => {
+      const logger: Logger = Container.get('logger');
+      try {
+        const ip = requestIp.getClientIp(req) || '';
+
+        const app_name = req.params.appName;
+        let actionName = req.params.actionName;
+
+        const { username, password } = req.body;
+
+        console.log(username, password, app_name, ip)
+
+        const openService = Container.get(OpenService);
+        const app = await openService.getDb({ name: app_name });
+        if (!app) {
+          return res.json({ code: 404, data: '应用不存在' });
+        }
+
+        let roles: any[] = [];
+
+        let permissions: any = {}
+        const userService = Container.get(UserService);
+        const user = await userService.getUserByName(username);
+        const is_admin = user && user.roles.includes('Admin');
+        if (is_admin) {
+          if (!user || user.app_name != app_name || user.password !== password) {
+            return res.json({ code: 401, data: '用户名或密码错误' });
+          }
+          if (user.status === UserStatus.disabled) {
+            return res.json({ code: 403, data: '账号已禁用' });
+          }
+          roles = ['Admin']
+        } else {
+          const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
+          const logPath = path.resolve(`${config.logPath}/actions/${app_name}/auth/${actionName}_${execTime}.log`);
+          fs.mkdirSync(path.dirname(logPath), { recursive: true });
+          const jsPath = checkActionName(app_name, `auth/${actionName}`)!;
+          if (!jsPath) {
+            return res.json({ code: 401, data: '禁止访问' });
+          }
+          const actionService = Container.get(ActionService);
+          const result: any = await actionService.runActionIsolated(jsPath, logPath, req);
+          if (!result || result.code !== 0) {
+            return res.json(result);
+          }
+          permissions = result.data;
+          roles = ['User']
+        }
+        const tokenService = Container.get(TokenService);
+        const result = await tokenService.create({
+          payload: {
+            username,
+            roles,
+            permissions,
+            app_name,
+            is_admin
+          },
+          client_ip: ip,
+          permission_type: PermissionType.User,
+        } as Token);
+        logger.info(username, '登录成功', ip)
+        return res.json({ code: 0, data: { token: result.token, expire_time: result.expire_time } });
+
+
+      } catch (e) {
+        next(e);
+      }
+    }
+  )
+
+
+  route.post(
+    '/:appName/auth/:actionName',
     celebrate({
       params: Joi.object({
         appName: Joi.string().required(),
@@ -72,34 +155,18 @@ export const openApis = (app: Router) => {
         let roles: any[] = [];
 
         let permissions: any = {}
-        if (actionName == 'token') {
-          const userService = Container.get(UserService);
-          const user = await userService.getUserByName(username);
-          const is_admin = user && user.roles.includes('Admin');
-          if (is_admin) {
-            if (!user || user.app_name != app_name || user.password !== password) {
-              return res.json({ code: 401, data: '用户名或密码错误' });
-            }
-            if (user.status === UserStatus.disabled) {
-              return res.json({ code: 403, data: '账号已禁用' });
-            }
-            roles = ['Admin']
-          } else {
-            const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
-            const logPath = path.resolve(`${config.logPath}/actions/${app_name}/auth/${actionName}_${execTime}.log`);
-            fs.mkdirSync(path.dirname(logPath), { recursive: true });
-            const jsPath = checkActionName(app_name, `auth/${actionName}`)!;
-            if (!jsPath) {
-              return res.json({ code: 401, data: '禁止访问' });
-            }
-            const actionService = Container.get(ActionService);
-            const result: any = await actionService.runActionIsolated(jsPath, logPath, req);
-            if (!result || result.code !== 0) {
-              return res.json(result);
-            }
-            permissions = result.data;
-            roles = ['User']
-          }
+        const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
+        const logPath = path.resolve(`${config.logPath}/actions/${app_name}/auth/${actionName}_${execTime}.log`);
+        fs.mkdirSync(path.dirname(logPath), { recursive: true });
+        const jsPath = checkActionName(app_name, `auth/${actionName}`)!;
+        if (!jsPath) {
+          return res.json({ code: 404, data: '禁止访问' });
+        }
+        const actionService = Container.get(ActionService);
+        const actionRes: any = await actionService.runActionIsolated(jsPath, logPath, req);
+        if (actionRes && actionRes.code === 999999) {
+          permissions = actionRes.data;
+          roles = ['User']
           const tokenService = Container.get(TokenService);
           const result = await tokenService.create({
             payload: {
@@ -107,43 +174,15 @@ export const openApis = (app: Router) => {
               roles,
               permissions,
               app_name,
-              is_admin
+              is_admin: false
             },
             client_ip: ip,
             permission_type: PermissionType.User,
           } as Token);
           logger.info(username, '登录成功', ip)
           return res.json({ code: 0, data: { token: result.token, expire_time: result.expire_time } });
-        } else {
-          const execTime = dayjs().format('YYYYMMDD-HHmmss.SSS');
-          const logPath = path.resolve(`${config.logPath}/actions/${app_name}/auth/${actionName}_${execTime}.log`);
-          fs.mkdirSync(path.dirname(logPath), { recursive: true });
-          const jsPath = checkActionName(app_name, `auth/${actionName}`)!;
-          if (!jsPath) {
-            return res.json({ code: 404, data: '禁止访问' });
-          }
-          const actionService = Container.get(ActionService);
-          const actionRes: any = await actionService.runActionIsolated(jsPath, logPath, req);
-          if (actionRes && actionRes.code === 999999) {
-            permissions = actionRes.data;
-            roles = ['User']
-            const tokenService = Container.get(TokenService);
-            const result = await tokenService.create({
-              payload: {
-                username,
-                roles,
-                permissions,
-                app_name,
-                is_admin: false
-              },
-              client_ip: ip,
-              permission_type: PermissionType.User,
-            } as Token);
-            logger.info(username, '登录成功', ip)
-            return res.json({ code: 0, data: { token: result.token, expire_time: result.expire_time } });
-          }
-          return res.json(actionRes);
         }
+        return res.json(actionRes);
 
       } catch (e) {
         next(e);

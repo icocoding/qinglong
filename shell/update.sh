@@ -258,15 +258,19 @@ reload_qinglong() {
 ## 更新qinglong
 update_qinglong() {
   rm -rf ${dir_tmp}/*
-  local mirror="gitee"
-  local downloadQLUrl="https://gitee.com/${QL_MAINTAINER}/qinglong/repository/archive"
-  local downloadStaticUrl="https://gitee.com/${QL_MAINTAINER}/qinglong-static/repository/archive"
-  local githubStatus=$(curl -s --noproxy "*" -m 2 -IL "https://google.com" | grep 200)
-  if [[ ! -z $githubStatus ]]; then
-    mirror="github"
-    downloadQLUrl="https://github.com/${QL_MAINTAINER}/qinglong/archive/refs/heads"
-    downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong-static/archive/refs/heads"
-  fi
+  # local mirror="gitee"
+  # local downloadQLUrl="https://gitee.com/${QL_MAINTAINER}/qinglong/repository/archive"
+  # local downloadStaticUrl="https://gitee.com/${QL_MAINTAINER}/qinglong-static/repository/archive"
+  # local githubStatus=$(curl -s --noproxy "*" -m 2 -IL "https://google.com" | grep 200)
+  # if [[ ! -z $githubStatus ]]; then
+  #   mirror="github"
+  #   downloadQLUrl="https://github.com/${QL_MAINTAINER}/qinglong/archive/refs/heads"
+  #   downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong-static/archive/refs/heads"
+  # fi
+
+  mirror="github"
+  downloadQLUrl="https://github.com/${QL_MAINTAINER}/qinglong/archive/refs/heads"
+  downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong-static/archive/refs/heads"
   echo -e "使用 ${mirror} 源更新...\n"
 
   local primary_branch="master"
