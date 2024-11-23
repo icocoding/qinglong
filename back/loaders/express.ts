@@ -35,14 +35,26 @@ export default ({ app }: { app: Application }) => {
   app.use(bodyParser.json({ limit: '50mb' }));
   app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));
 
-  app.use(
-    jwt({
-      secret: config.secret,
-      algorithms: ['HS384'],
-    }).unless({
-      path: [...config.apiWhiteList, /^\/open\//],
-    }),
-  );
+  // app.use(
+  //   jwt({
+  //     secret: config.secret,
+  //     algorithms: ['HS384'],
+  //   }).unless({
+  //     path: [...config.apiWhiteList, /^\/open\//],
+  //   }),
+  // );
+
+  const jwtMiddleware = jwt({
+    secret: config.secret,
+    algorithms: ['HS384'],
+  });
+
+  // 使用 unless 方法
+  jwtMiddleware.unless = unless({
+    path: [...config.apiWhiteList, /^\/open\//],
+  });
+
+  app.use(jwtMiddleware);
 
   app.use((req: Request, res, next) => {
     console.log('Request Path:', req.path);
@@ -189,3 +201,7 @@ export default ({ app }: { app: Application }) => {
     },
   );
 };
+function unless(arg0: { path: (string | RegExp)[]; }): typeof import("express-unless") {
+  throw new Error('Function not implemented.');
+}
+

@@ -6,6 +6,7 @@
     "paths": {
       "@/*": ["./back/*"]
     },
+    "types": ["node"],
     "allowSyntheticDefaultImports": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
