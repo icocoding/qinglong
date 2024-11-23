@@ -76,12 +76,16 @@ export default ({ app }: { app: Application }) => {
         await tokenService.expire([tokenModel.id]);
       }
       return res
-      .status(200)
-      .send({ code: 0, msg: 'Logout success' })
-      .end();
+        .status(200)
+        .send({ code: 0, msg: 'Logout success' })
+        .end();
     }
 
     const names = actionName.split('/');
+    if (names[1] == 'auth') {
+      console.log('auth action:', names)
+      return next();
+    }
     const actionService = Container.get(ActionService);
     const action = await actionService.getDb({
       app_name: names[0],

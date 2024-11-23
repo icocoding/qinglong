@@ -146,7 +146,7 @@ export const openApis = (app: Router) => {
             logger.info(username, '登录成功', ip)
             return res.json({ code: 0, data: { token: result.token, expire_time: result.expire_time } });
           }
-          return actionRes;
+          return res.json(actionRes);
         }
 
       } catch (e) {
