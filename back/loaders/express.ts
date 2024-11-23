@@ -45,17 +45,21 @@ export default ({ app }: { app: Application }) => {
   //   }),
   // );
 
-  const jwtMiddleware = jwt({
+  const jwtMiddleware: any = jwt({
     secret: config.secret,
     algorithms: ['HS384'],
-  });
+  }) as jwt.RequestHandler & { unless: typeof unless };
 
-  // 使用 unless 方法
-  jwtMiddleware.unless = unless.unless({
-    path: [...config.apiWhiteList, /^\/open\//],
-  });
+  jwtMiddleware.unless = unless;
 
-  app.use(jwtMiddleware);
+  app.use(
+    jwtMiddleware.unless({
+      path: [
+        ...config.apiWhiteList,
+        /^\/open\//,
+      ],
+    }),
+  );
 
   app.use((req: Request, res, next) => {
     console.log('Request Path:', req.path);
