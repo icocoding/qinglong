@@ -1,10 +1,9 @@
-version: 2024.11.1
-publishTime: 2024-11-12 21:01
+version: 2024.11.2
+publishTime: 2024-11-23 16:01
 changeLog: |
   1. Auth增加其他方法, 返回 `code = 999999`, 表示可以获取token, 其他返回类似普通Action
 
 changeLogLink: https://raw.githubusercontent.com/icocoding/qinglong/develop/version.yaml
-
 history:
   - version: 2024.10.3
     publishTime: 2024-10-24 17:32
