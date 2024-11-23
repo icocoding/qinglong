@@ -13,11 +13,13 @@ async function startServer() {
 
   app
     .listen(config.actionsPort, () => {
+      Logger.debug(`✌️ actions 服务启动...`);
+      process.send?.('ready');
       Logger.debug(`✌️ actions 服务启动成功！`);
       console.debug(`✌️ actions 服务启动成功！ port: ${config.actionsPort}`);
-      process.send?.('ready');
     })
     .on('error', (err) => {
+      Logger.debug(`✌️ actions 服务启动失败--------------`);
       Logger.error(err);
       console.error(err);
       process.exit(1);

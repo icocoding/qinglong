@@ -15,6 +15,7 @@ import { errors } from 'celebrate';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import { serveEnv } from '../config/serverEnv';
 import Logger from './logger';
+import unless from 'express-unless'; // 导入 express-unless
 
 export default ({ app }: { app: Application }) => {
   app.set('trust proxy', 'loopback');
@@ -50,7 +51,7 @@ export default ({ app }: { app: Application }) => {
   });
 
   // 使用 unless 方法
-  jwtMiddleware.unless = unless({
+  jwtMiddleware.unless = unless.unless({
     path: [...config.apiWhiteList, /^\/open\//],
   });
 
@@ -201,7 +202,3 @@ export default ({ app }: { app: Application }) => {
     },
   );
 };
-function unless(arg0: { path: (string | RegExp)[]; }): typeof import("express-unless") {
-  throw new Error('Function not implemented.');
-}
-
