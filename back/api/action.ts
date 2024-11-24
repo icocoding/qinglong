@@ -141,9 +141,9 @@ export const openApis = (app: Router) => {
         const app_name = req.params.appName;
         let actionName = req.params.actionName;
 
-        const { username, password } = req.body;
+        // const { username, password } = req.body;
 
-        console.log(username, password, app_name, ip)
+        console.log(app_name, ip)
 
         const openService = Container.get(OpenService);
         const app = await openService.getDb({ name: app_name });
@@ -169,7 +169,7 @@ export const openApis = (app: Router) => {
           const tokenService = Container.get(TokenService);
           const result = await tokenService.create({
             payload: {
-              username,
+              username: permissions.username,
               roles,
               permissions,
               app_name,
@@ -178,7 +178,7 @@ export const openApis = (app: Router) => {
             client_ip: ip,
             permission_type: PermissionType.User,
           } as Token);
-          logger.info(username, '登录成功', ip)
+          logger.info(permissions.username, '登录成功', ip)
           return res.json({ code: 0, data: { token: result.token, expire_time: result.expire_time } });
         }
         return res.json(actionRes);
