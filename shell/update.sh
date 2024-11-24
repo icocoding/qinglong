@@ -270,7 +270,7 @@ update_qinglong() {
 
   mirror="github"
   downloadQLUrl="https://github.com/${QL_MAINTAINER}/qinglong/archive/refs/heads"
-  downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong-static/archive/refs/heads"
+  downloadStaticUrl="https://github.com/${QL_MAINTAINER}/qinglong/releases/download"
   echo -e "使用 ${mirror} 源更新...\n"
 
   local primary_branch="master"
@@ -285,6 +285,9 @@ update_qinglong() {
     echo -e "更新青龙源文件成功...\n"
 
     unzip -oq ${dir_tmp}/ql.zip -d ${dir_tmp}
+    
+    LATEST_VERSION=$(cat ${dir_tmp}/version.yaml | grep 'version:' | awk '{print $2}' | grep -v '^$' | head -n 1)
+    echo -e "青龙版本：${LATEST_VERSION}\n"
 
     update_qinglong_static
   else
@@ -293,7 +296,7 @@ update_qinglong() {
 }
 
 update_qinglong_static() {
-  wget -cqO "${dir_tmp}/static.zip" "${downloadStaticUrl}/${primary_branch}.zip"
+  wget -cqO "${dir_tmp}/static.zip" "${downloadStaticUrl}/${LATEST_VERSION}/qinglong_static.zip"
   exit_status=$?
 
   if [[ $exit_status -eq 0 ]]; then

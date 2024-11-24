@@ -48,7 +48,6 @@ export const openApis = (app: Router) => {
     celebrate({
       params: Joi.object({
         appName: Joi.string().required(),
-        actionName: Joi.string().required(),
       }),
       body: Joi.object({
         username: Joi.string().required(),
